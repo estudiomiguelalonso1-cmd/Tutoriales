@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Onboarding Contabilidad</title>
+<meta name="description" content="Recorrido de ingreso para el equipo de Contabilidad del Estudio Miguel Alonso.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230F2F5C'/><path d='M14 44 L30 20 L38 32 L44 24 L52 44Z' fill='%23F26A1B'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=JetBrains+Mono:wght@500&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+:root{
+  --navy:#0F2F5C; --navy-2:#1A4580; --navy-ink:#0A1F3D;
+  --orange:#F26A1B; --orange-2:#FF8A3D; --orange-soft:#FFE8D9;
+  --white:#FFFFFF; --paper:#F2F5F9; --line:#D5DEE9;
+  --ink:#0E1A2B; --muted:#56667D; --ok:#1D8A57; --ok-soft:#E1F4EA;
+  --f-display:"Archivo","Arial Narrow","Segoe UI",sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",Roboto,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--paper)}
+body{margin:0;font-family:var(--f-body);color:var(--ink);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:0 56px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:18px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:700;color:var(--navy)}
+.brand .mk{width:34px;height:34px;border-radius:8px;background:var(--navy);color:var(--white);display:grid;place-items:center;font-size:13px;letter-spacing:.08em}
+.brand small{display:block;font-family:var(--f-body);font-weight:600;font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+
+/* hero */
+.hero{position:relative;overflow:hidden;background:var(--navy);color:var(--white);border-radius:18px;padding:clamp(24px,5vw,56px);display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:32px;align-items:center}
+.hero::before{content:"";position:absolute;right:-80px;top:-120px;width:360px;height:620px;background:var(--orange);transform:rotate(18deg);opacity:.95}
+.hero::after{content:"";position:absolute;right:250px;top:-120px;width:18px;height:620px;background:var(--orange-2);transform:rotate(18deg)}
+.hero > *{position:relative;z-index:1}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--orange-2)}
+.hero h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,5.4vw,62px);line-height:1.02;margin:10px 0 14px;text-wrap:balance}
+.hero p{margin:0;max-width:52ch;font-size:18px;color:#D6E0EE}
+.prog{background:var(--white);color:var(--ink);border-radius:14px;padding:20px;box-shadow:0 24px 50px -24px rgba(0,0,0,.5)}
+.prog h2{margin:0 0 4px;font-family:var(--f-display);font-size:18px;color:var(--navy)}
+.prog .big{font-family:var(--f-display);font-weight:800;font-size:44px;color:var(--navy);line-height:1;font-variant-numeric:tabular-nums}
+.prog .big small{font-size:18px;color:var(--muted);font-weight:600}
+.meter{height:10px;background:var(--paper);border-radius:6px;overflow:hidden;margin:12px 0 8px}
+.meter i{display:block;height:100%;width:0;background:var(--orange);border-radius:6px;transition:width .6s}
+.prog p{color:var(--muted);font-size:13px;margin:0}
+@media (max-width:820px){.hero{grid-template-columns:1fr}.hero::before,.hero::after{opacity:.35}}
+
+/* intro */
+.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:22px 0 8px}
+.how div{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:15px}
+.how b{display:block;font-family:var(--f-display);color:var(--navy);font-size:17px;margin-bottom:2px}
+@media (max-width:720px){.how{grid-template-columns:1fr}}
+
+/* etapas */
+.stage{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px;padding-block:30px;border-top:1px solid var(--line)}
+.stage:first-of-type{border-top:0}
+.stage-h .n{font-family:var(--f-mono);font-size:13px;color:var(--orange);font-weight:700;letter-spacing:.1em}
+.stage-h h2{font-family:var(--f-display);font-size:26px;line-height:1.1;margin:6px 0 6px;color:var(--navy);text-wrap:balance}
+.stage-h p{margin:0;color:var(--muted);font-size:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+@media (max-width:720px){.stage{grid-template-columns:1fr;gap:12px}}
+.card{position:relative;display:flex;flex-direction:column;gap:8px;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px;text-decoration:none;color:var(--ink);transition:border-color .15s,transform .15s,box-shadow .15s}
+.card:hover{border-color:var(--navy);transform:translateY(-2px);box-shadow:0 14px 30px -20px rgba(10,31,61,.5)}
+.card .kind{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.card h3{margin:0;font-family:var(--f-display);font-size:20px;line-height:1.15;color:var(--navy)}
+.card p{margin:0;font-size:14px;color:var(--muted);flex:1}
+.card .meta{display:flex;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.st{font-size:12px;font-weight:700;border-radius:99px;padding:3px 10px;background:var(--paper);color:var(--muted);letter-spacing:.02em;text-transform:none}
+.st.ok{background:var(--ok-soft);color:#0F5534}
+.st.try{background:var(--orange-soft);color:#9A3D06}
+.card.new::after{content:"Nuevo";position:absolute;top:-9px;right:14px;background:var(--orange);color:var(--white);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:99px;padding:2px 9px}
+.foot{margin-top:30px;border-top:1px solid var(--line);padding-top:14px;font-size:13px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.foot button{font:inherit;border:1px solid var(--line);background:var(--white);border-radius:8px;padding:4px 10px;cursor:pointer;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="mk">EMA</span><div>Estudio Miguel Alonso<small>Contabilidad</small></div></div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Onboarding · Contabilidad</div>
+      <h1>Bienvenido al equipo de Contabilidad</h1>
+      <p>Este recorrido te lleva, paso a paso, desde tu primer día hasta enviar tu primer subdiario revisado. Cada tutorial es un video corto con un test al final.</p>
+    </div>
+    <div class="prog" aria-live="polite">
+      <h2>Tu progreso</h2>
+      <div class="big"><span id="done">0</span> <small>de <span id="total">0</span> pasos completados</small></div>
+      <div class="meter"><i id="bar"></i></div>
+      <p id="progmsg">Empezá por la etapa 1.</p>
+    </div>
+  </section>
+
+  <div class="how">
+    <div><b>1 · Mirá el video</b>Con voz y subtítulos. Podés pausar y saltar capítulos.</div>
+    <div><b>2 · Hacé el test</b>Situaciones reales. Se aprueba con el 70 %.</div>
+    <div><b>3 · Seguí el orden</b>Cada etapa se apoya en la anterior.</div>
+  </div>
+
+  <main id="stages"></main>
+
+  <footer class="foot">
+    <span>© Estudio Miguel Alonso · Material de capacitación interna</span>
+    <span>El progreso se guarda solo en este navegador. <button type="button" id="reset">Reiniciar progreso</button></span>
+  </footer>
+</div>
+
+<script>
+const ETAPAS = [
+  { n: "Etapa 1", t: "Tu primera semana", d: "Accesos, herramientas del estudio y el vocabulario básico.", items: [
+    { href: "checklist.html", kind: "Checklist", t: "Checklist del primer mes", p: "Los accesos que tenés que pedir y lo que tenés que tener listo.", meta: ["Interactivo"], id: "check", nuevo: true },
+    { href: "tutoriales/intranet.html", kind: "Tutorial", t: "Cómo usar la intranet", p: "Disponibilidad, organigrama, licencias, aprendizaje y certificados.", meta: ["5 min", "8 preguntas"], id: "intranet" },
+    { href: "glosario.html", kind: "Glosario", t: "Glosario contable-impositivo", p: "CUIT, CAE, percepción, retención, alícuota, DDJJ y más.", meta: ["Con práctica"], id: "glosario", nuevo: true },
+  ]},
+  { n: "Etapa 2", t: "Las herramientas", d: "Los tres sistemas que vas a usar todos los días.", items: [
+    { href: "tutoriales/arca.html", kind: "Tutorial", t: "Primeros pasos en ARCA", p: "Clave Fiscal, Comprobantes en línea y Mis Comprobantes.", meta: ["6 min", "8 preguntas"], id: "arca" },
+    { href: "tutoriales/onvio-iva.html", kind: "Tutorial", t: "IVA Ventas y Compras en Onvio", p: "Clientes, proveedores, carga manual, importación y regímenes.", meta: ["13 min", "10 preguntas"], id: "onvio-iva" },
+    { href: "tutoriales/importador-del-estudio.html", kind: "Tutorial", t: "Usar el Importador del estudio", p: "De los PDFs de compras al Excel listo para Onvio.", meta: ["9 min", "8 preguntas"], id: "importador-estudio", nuevo: true },
+  ]},
+  { n: "Etapa 3", t: "Cargar comprobantes", d: "Lo que necesitás para el data entry del día a día.", items: [
+    { href: "tutoriales/importacion-masiva.html", kind: "Tutorial", t: "Importación masiva por Excel", p: "Configuraciones, códigos, PRE005, columnas Q a T y tasas de IVA.", meta: ["11 min", "10 preguntas"], id: "importacion-excel" },
+    { href: "tutoriales/anular-comprobante.html", kind: "Tutorial", t: "Cómo anular un comprobante", p: "Emitidos, registrados e inutilizados; factura electrónica y talonario.", meta: ["5 min", "8 preguntas"], id: "anular-comprobante" },
+  ]},
+  { n: "Etapa 4", t: "Tu subdiario", d: "Cómo se organiza el mes, cómo controlarlo y qué evitar.", items: [
+    { href: "tutoriales/subdiarios.html", kind: "Tutorial", t: "El proceso de subdiarios", p: "Asignación, vencimiento, paso a paso y revisión cruzada.", meta: ["4 min", "7 preguntas"], id: "subdiarios", nuevo: true },
+    { href: "tutoriales/revision-con-claude.html", kind: "Tutorial", t: "Revisión de subdiarios con Claude", p: "Ventas contra ARCA y compras contra PDFs, con prompts para copiar.", meta: ["5 min", "7 preguntas"], id: "revision-claude", nuevo: true },
+    { href: "tutoriales/errores-frecuentes.html", kind: "Tutorial", t: "Errores frecuentes", p: "Doce errores típicos: cómo se ven, por qué pasan y qué hacer.", meta: ["5 min", "6 preguntas"], id: "errores-frecuentes", nuevo: true },
+  ]},
+];
+
+function leer(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+function estado(it) {
+  if (it.id === "check") {
+    const c = leer("ema-checklist") || {}, n = Object.values(c).filter(Boolean).length;
+    return n ? { cls: n >= 12 ? "ok" : "try", txt: `${n} de 12 listos`, ok: n >= 12 } : { cls: "", txt: "Pendiente", ok: false };
+  }
+  if (it.id === "glosario") {
+    const g = leer("ema-glosario");
+    return g ? { cls: "ok", txt: "Practicado", ok: true } : { cls: "", txt: "Pendiente", ok: false };
+  }
+  const r = leer("ema-quiz-" + it.id);
+  if (!r) return { cls: "", txt: "Pendiente", ok: false };
+  const ok = r.n >= Math.ceil(r.tot * 0.7);
+  return { cls: ok ? "ok" : "try", txt: ok ? `Aprobado ${r.n}/${r.tot}` : `Reintentar ${r.n}/${r.tot}`, ok };
+}
+function render() {
+  let total = 0, done = 0, siguiente = null;
+  document.getElementById("stages").innerHTML = ETAPAS.map((e) => `
+    <section class="stage" aria-labelledby="h-${e.n}">
+      <div class="stage-h"><div class="n">${e.n}</div><h2 id="h-${e.n}">${e.t}</h2><p>${e.d}</p></div>
+      <div class="cards">${e.items.map((it) => {
+        const s = estado(it); total++; if (s.ok) done++; else if (!siguiente) siguiente = it.t;
+        return `<a class="card${it.nuevo ? " new" : ""}" href="${it.href}">
+          <span class="kind">${it.kind}<span class="st ${s.cls}">${s.txt}</span></span>
+          <h3>${it.t}</h3><p>${it.p}</p>
+          <span class="meta">${it.meta.map((m) => `<span>${m}</span>`).join("<span>·</span>")}</span></a>`;
+      }).join("")}</div>
+    </section>`).join("");
+  document.getElementById("done").textContent = done;
+  document.getElementById("total").textContent = total;
+  document.getElementById("bar").style.width = (done / total * 100) + "%";
+  document.getElementById("progmsg").textContent = done === total ? "¡Completaste el onboarding! 🎉" : `Siguiente: ${siguiente}`;
+}
+document.getElementById("reset").onclick = () => {
+  if (!confirm("¿Borrar el progreso guardado en este navegador?")) return;
+  try { Object.keys(localStorage).filter((k) => k.startsWith("ema-")).forEach((k) => localStorage.removeItem(k)); } catch (e) {}
+  render();
+};
+window.addEventListener("pageshow", render);
+render();
+</script>
+</body>
+</html>

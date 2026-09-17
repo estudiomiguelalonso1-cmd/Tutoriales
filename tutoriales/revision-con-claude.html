@@ -1,0 +1,1172 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Revisión de subdiarios con Claude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=JetBrains+Mono:wght@500&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+:root{
+  --navy:#0F2F5C; --navy-2:#1A4580; --navy-ink:#0A1F3D;
+  --orange:#F26A1B; --orange-2:#FF8A3D; --orange-soft:#FFE8D9;
+  --white:#FFFFFF; --paper:#F2F5F9; --line:#D5DEE9;
+  --ink:#0E1A2B; --muted:#56667D;
+  --ok:#1D8A57; --ok-soft:#E1F4EA; --bad:#C23A2E; --bad-soft:#FBE6E3;
+  --f-display:"Archivo","Arial Narrow","Segoe UI",sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",Roboto,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,"Courier New",monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--paper)}
+body{margin:0;font-family:var(--f-body);color:var(--ink);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:0 48px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+
+/* ---------- cabecera ---------- */
+.top{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:18px 14px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:700;letter-spacing:.02em;color:var(--navy)}
+.brand .mk{width:34px;height:34px;border-radius:8px;background:var(--navy);color:var(--white);display:grid;place-items:center;font-size:13px;letter-spacing:.08em}
+.brand small{display:block;font-family:var(--f-body);font-weight:600;font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.tag{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);background:var(--orange-soft);padding:4px 10px;border-radius:99px}
+.head{max-width:1180px;margin:0 auto 16px}
+.head h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,4vw,42px);line-height:1.05;margin:6px 0 6px;color:var(--navy);text-wrap:balance}
+.head p{margin:0;color:var(--muted);max-width:65ch}
+
+/* ---------- layout ---------- */
+.layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:20px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- reproductor ---------- */
+.player{background:var(--navy-ink);border-radius:14px;overflow:hidden;box-shadow:0 18px 40px -24px rgba(10,31,61,.55)}
+.screen{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--navy)}
+.stage{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0;overflow:hidden}
+.poster{position:absolute;inset:0;display:grid;place-items:center;background:rgba(10,31,61,.35);border:0;padding:0;z-index:30}
+.poster span{width:84px;height:84px;border-radius:50%;background:var(--orange);display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.35);transition:transform .2s}
+.poster:hover span{transform:scale(1.07)}
+.poster svg{width:34px;height:34px;margin-left:5px;fill:var(--white)}
+.subs{min-height:64px;padding:12px 18px;color:var(--white);font-size:clamp(15px,1.8vw,19px);line-height:1.4;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--navy-ink);border-top:1px solid rgba(255,255,255,.08)}
+.subs[data-off="1"]{display:none}
+.bar{position:relative;height:8px;background:rgba(255,255,255,.14);cursor:pointer;margin:0 18px;border-radius:4px}
+.bar .fill{position:absolute;left:0;top:0;bottom:0;background:var(--orange);border-radius:4px;width:0}
+.bar .tick{position:absolute;top:-3px;width:3px;height:14px;background:var(--white);opacity:.55;border-radius:2px;transform:translateX(-1px)}
+.bar:hover{height:10px}
+.ctrl{display:flex;align-items:center;gap:6px;padding:10px 12px 12px;color:var(--white);flex-wrap:wrap}
+.ctrl button{background:transparent;border:0;border-radius:8px;padding:6px 9px;display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--white)}
+.ctrl button:hover{background:rgba(255,255,255,.1)}
+.ctrl svg{width:20px;height:20px;fill:currentColor}
+.ctrl .time{font-variant-numeric:tabular-nums;font-size:13px;opacity:.8;padding:0 6px}
+.ctrl .sp{flex:1}
+.ctrl .chip[aria-pressed="false"]{opacity:.55}
+.ctrl .chname{font-size:13px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:38ch}
+@media (max-width:560px){.ctrl .chname{display:none}}
+.player:fullscreen{display:flex;flex-direction:column;justify-content:center;border-radius:0}
+.player:fullscreen .screen{width:min(100vw,calc((100vh - 150px)*16/9));margin:0 auto}
+
+/* ---------- capítulos ---------- */
+.side{display:flex;flex-direction:column;gap:14px}
+.box{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px}
+.box h3{margin:0 0 8px;font-family:var(--f-display);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.chapters{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;counter-reset:c}
+.chapters button{width:100%;text-align:left;background:transparent;border:0;border-radius:8px;padding:8px 10px;display:flex;gap:10px;align-items:baseline;color:var(--ink)}
+.chapters button::before{counter-increment:c;content:counter(c);font-family:var(--f-mono);font-size:12px;color:var(--muted);min-width:1.2em}
+.chapters button:hover{background:var(--paper)}
+.chapters button[aria-current="true"]{background:var(--orange-soft);color:var(--navy);font-weight:700}
+.chapters button[aria-current="true"]::before{color:var(--orange)}
+.chapters .d{margin-left:auto;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chapters .quizb::before{content:"✓"}
+.help{font-size:13px;color:var(--muted);margin:0}
+.help kbd{font-family:var(--f-mono);font-size:11px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:var(--paper)}
+
+/* ---------- quiz ---------- */
+.quiz{max-width:1180px;margin:28px auto 0;scroll-margin-top:16px}
+.qcard{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:clamp(18px,3vw,32px);max-width:820px}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.qhead h2{margin:0;font-family:var(--f-display);font-size:26px;color:var(--navy)}
+.qprog{display:flex;gap:4px}
+.qprog i{width:22px;height:6px;border-radius:3px;background:var(--line)}
+.qprog i.cur{background:var(--navy)}
+.qprog i.ok{background:var(--ok)}
+.qprog i.bad{background:var(--bad)}
+.qnum{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);font-weight:700}
+.qtext{font-size:clamp(18px,2.2vw,21px);font-weight:600;margin:6px 0 16px;text-wrap:pretty;max-width:65ch}
+.qscene{background:var(--paper);border-left:4px solid var(--navy);border-radius:6px;padding:10px 14px;margin:0 0 14px;font-size:15px;color:var(--ink)}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;background:var(--white);border:2px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;transition:border-color .15s,background .15s}
+.opt:hover:not(:disabled){border-color:var(--navy-2)}
+.opt b{font-family:var(--f-mono);font-size:13px;min-width:22px;height:22px;border-radius:6px;background:var(--paper);display:grid;place-items:center;color:var(--navy)}
+.opt:disabled{cursor:default}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt.dim{opacity:.55}
+.fb{margin-top:14px;border-radius:10px;padding:12px 14px;font-size:15px}
+.fb.ok{background:var(--ok-soft);color:#0F5534}
+.fb.bad{background:var(--bad-soft);color:#7E2018}
+.fb strong{display:block;margin-bottom:2px}
+.qact{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btn{border:0;border-radius:10px;padding:11px 18px;font-weight:700;background:var(--navy);color:var(--white)}
+.btn:hover{background:var(--navy-2)}
+.btn.alt{background:var(--white);color:var(--navy);border:2px solid var(--navy)}
+.btn.or{background:var(--orange)}
+.btn.or:hover{background:#DB5A0E}
+.score{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.ring{--p:0;width:120px;height:120px;border-radius:50%;background:conic-gradient(var(--c,var(--ok)) calc(var(--p)*1%),var(--line) 0);display:grid;place-items:center}
+.ring span{width:92px;height:92px;border-radius:50%;background:var(--white);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:28px;color:var(--navy)}
+.review{margin:18px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.review li{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+.review li i{font-style:normal;font-weight:800}
+.review li.ok i{color:var(--ok)}
+.review li.bad i{color:var(--bad)}
+.review button{margin-left:auto;background:transparent;border:1px solid var(--line);border-radius:8px;padding:3px 9px;font-size:13px;white-space:nowrap;color:var(--navy)}
+.foot{max-width:1180px;margin:36px auto 0;font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px}
+
+/* =================================================================
+   ESCENAS (lienzo 1280 x 720)
+   ================================================================= */
+.sc{position:absolute;inset:0;font-family:var(--f-body);color:var(--ink);animation:scIn .55s ease both}
+@keyframes scIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.sc.dark{background:var(--navy);color:var(--white)}
+.sc.light{background:var(--paper)}
+.sc.warm{background:var(--orange);color:var(--white)}
+.wm{position:absolute;left:48px;bottom:26px;font-family:var(--f-display);font-weight:700;font-size:15px;letter-spacing:.14em;text-transform:uppercase;opacity:.55;z-index:6}
+.chl{position:absolute;right:48px;top:30px;font-size:15px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.6;z-index:6}
+.eyebrow{font-size:18px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--orange)}
+.sc.warm .eyebrow{color:var(--navy-ink)}
+.h{font-family:var(--f-display);font-weight:800;line-height:1.02;letter-spacing:-.01em;margin:10px 0 0;text-wrap:balance}
+.h.xl{font-size:92px}.h.l{font-size:60px}.h.m{font-size:44px}
+.pad{position:absolute;left:80px;right:80px;top:74px}
+.rv{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
+.rv.on{opacity:1;transform:none}
+.big-list{list-style:none;margin:34px 0 0;padding:0;display:flex;flex-direction:column;gap:18px;font-size:30px;line-height:1.25}
+.big-list li{display:flex;gap:18px;align-items:flex-start}
+.big-list li::before{content:"";flex:none;width:14px;height:14px;margin-top:11px;border-radius:3px;background:var(--orange)}
+
+/* título */
+.t-band{position:absolute;right:-120px;top:-60px;width:620px;height:900px;background:var(--orange);transform:rotate(18deg)}
+.t-band2{position:absolute;right:250px;top:-60px;width:26px;height:900px;background:var(--orange-2);transform:rotate(18deg);opacity:.9}
+.t-card{position:absolute;right:70px;top:190px;width:380px;background:var(--white);color:var(--ink);border-radius:16px;padding:26px;box-shadow:0 30px 60px -20px rgba(0,0,0,.45)}
+.t-card .ln{height:14px;border-radius:7px;background:var(--line);margin:10px 0}
+.t-card .stamp{margin-top:18px;display:inline-block;border:4px solid var(--bad);color:var(--bad);font-family:var(--f-display);font-weight:800;font-size:40px;letter-spacing:.12em;padding:2px 16px;transform:rotate(-8deg);border-radius:8px}
+.t-meta{display:flex;gap:12px;margin-top:30px}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:99px;padding:8px 18px;font-size:20px;font-weight:700}
+.pill.o{background:var(--orange);color:var(--white)}
+.pill.w{background:rgba(255,255,255,.14);color:var(--white)}
+.pill.n{background:var(--navy);color:var(--white)}
+
+/* libro IVA (mock) */
+.ledger{position:absolute;left:80px;right:80px;top:395px;background:var(--white);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:22px}
+.ledger .r{display:grid;grid-template-columns:150px 110px 260px 1fr 190px;padding:14px 22px;border-top:1px solid var(--line);align-items:center;font-variant-numeric:tabular-nums;position:relative}
+.ledger .r.hd{border-top:0;background:var(--navy);color:var(--white);font-weight:700;font-size:17px;letter-spacing:.06em;text-transform:uppercase}
+.ledger .r .num{text-align:right}
+.ledger .strike{position:absolute;right:26px;top:50%;transform:translateY(-50%) rotate(-6deg) scale(1.6);opacity:0;border:4px solid var(--bad);color:var(--bad);font-family:var(--f-display);font-weight:800;letter-spacing:.14em;padding:0 12px;border-radius:6px;background:var(--white);transition:all .45s cubic-bezier(.2,1.6,.4,1)}
+.ledger .strike.on{opacity:1;transform:translateY(-50%) rotate(-6deg) scale(1)}
+
+/* casos */
+.cases{position:absolute;left:80px;right:80px;top:250px;display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.case{background:var(--white);border:2px solid var(--line);border-radius:16px;padding:26px 26px 30px;min-height:340px;display:flex;flex-direction:column;gap:12px}
+.case .ic{width:62px;height:62px;border-radius:14px;display:grid;place-items:center;background:var(--orange-soft)}
+.case .ic svg{width:34px;height:34px;fill:none;stroke:var(--orange);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.case h4{margin:6px 0 0;font-family:var(--f-display);font-size:32px;line-height:1.05;color:var(--navy)}
+.case p{margin:0;font-size:22px;color:var(--muted);line-height:1.3}
+.case .k{margin-top:auto;font-size:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--orange)}
+
+/* rutas */
+.route{position:absolute;left:80px;right:80px;top:330px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.crumb{background:var(--white);color:var(--navy);border:3px solid var(--navy);border-radius:14px;padding:18px 28px;font-family:var(--f-display);font-weight:800;font-size:40px;box-shadow:0 8px 0 var(--navy)}
+.crumb.act{background:var(--orange);border-color:var(--orange);color:var(--white);box-shadow:0 8px 0 #B94C0C}
+.arrow{font-size:46px;color:var(--orange);font-weight:800}
+.route-note{position:absolute;left:80px;right:80px;top:520px;font-size:28px;color:var(--muted)}
+.mono{font-family:var(--f-mono)}
+
+/* captura */
+.shot-h{position:absolute;left:60px;top:34px;right:300px}
+.shot-h .h{font-size:40px}
+.frame{position:absolute;background:var(--white);border-radius:12px;box-shadow:0 20px 50px -24px rgba(10,31,61,.45);overflow:hidden;border:1px solid var(--line)}
+.frame .chrome{height:34px;background:#E6ECF3;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--line)}
+.frame .chrome i{width:11px;height:11px;border-radius:50%;background:#C5CFDB}
+.frame .chrome span{margin-left:14px;font-size:14px;color:var(--muted);font-family:var(--f-mono)}
+.viewport{position:absolute;left:0;right:0;bottom:0;top:34px;overflow:hidden;background:var(--white)}
+.layer{position:absolute;left:0;top:0;transform-origin:0 0;transition:transform 1.3s cubic-bezier(.45,.05,.2,1)}
+.layer img{display:block;width:100%;height:100%;user-select:none}
+.mark{position:absolute;border:calc(4px * var(--inv,1)) solid var(--orange);border-radius:calc(6px * var(--inv,1));box-shadow:0 0 0 calc(9999px) rgba(10,31,61,0);opacity:0;transition:opacity .4s}
+.mark.on{opacity:1;animation:markP 1.6s ease-in-out infinite}
+@keyframes markP{50%{border-color:var(--orange-2)}}
+.cursor{position:absolute;width:calc(34px * var(--inv,1));height:calc(34px * var(--inv,1));left:50%;top:115%;transition:left 1.1s cubic-bezier(.45,.05,.2,1),top 1.1s cubic-bezier(.45,.05,.2,1);z-index:5;pointer-events:none}
+.cursor svg{width:100%;height:100%;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
+.cursor .rip{position:absolute;left:0;top:0;width:100%;height:100%;border-radius:50%;border:calc(3px * var(--inv,1)) solid var(--orange);transform:translate(-50%,-50%) scale(.2);opacity:0}
+.cursor.click .rip{animation:rip .8s ease-out .9s}
+@keyframes rip{0%{opacity:1;transform:translate(-50%,-50%) scale(.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6)}}
+.callout{position:absolute;background:var(--navy);color:var(--white);border-radius:12px;padding:14px 18px;font-size:22px;font-weight:600;line-height:1.25;box-shadow:0 14px 30px -14px rgba(0,0,0,.5);z-index:8;max-width:420px}
+.callout em{font-style:normal;color:var(--orange-2)}
+.dialog{position:absolute;left:50%;top:50%;width:520px;transform:translate(-50%,-44%);background:var(--white);border-radius:12px;box-shadow:0 30px 80px rgba(10,31,61,.5);border:1px solid var(--line);z-index:9;font-size:20px;overflow:hidden}
+.dialog.rv{transform:translate(-50%,-38%)}
+.dialog.rv.on{transform:translate(-50%,-44%)}
+.dialog .dt{background:var(--navy);color:var(--white);padding:12px 18px;font-weight:700}
+.dialog .db{padding:16px 18px;display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-variant-numeric:tabular-nums}
+.dialog .db span{color:var(--muted)}
+.dialog .df{display:flex;gap:10px;padding:0 18px 18px}
+.dialog .df b{padding:8px 18px;border-radius:8px;background:var(--paper);border:1px solid var(--line)}
+.dialog .df b.pri{background:#5C6470;color:var(--white);border-color:#5C6470;position:relative}
+.dialog .df b.pri::after{content:"";position:absolute;inset:-7px;border:4px solid var(--orange);border-radius:12px;animation:markP 1.6s infinite}
+
+/* alerta */
+.alert-ic{position:absolute;right:90px;top:120px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.14);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:220px;color:var(--white);line-height:1}
+.law{display:inline-block;margin-top:26px;background:var(--navy-ink);color:var(--white);font-family:var(--f-mono);font-size:30px;padding:10px 20px;border-radius:10px}
+.nc{position:absolute;left:80px;right:80px;bottom:90px;display:flex;gap:18px;align-items:center;font-size:30px;font-weight:700}
+.nc .pill{font-size:26px}
+
+/* aviso / cadena */
+.chain{position:absolute;left:80px;right:80px;top:330px;display:flex;align-items:center;gap:30px}
+.doc{width:300px;background:var(--white);border:2px solid var(--line);border-radius:14px;padding:22px;position:relative}
+.doc h5{margin:0 0 10px;font-family:var(--f-display);font-size:30px;color:var(--navy)}
+.doc .ln{height:12px;border-radius:6px;background:var(--line);margin:9px 0}
+.doc .x{position:absolute;inset:-4px;border-radius:16px;display:grid;place-items:center;background:rgba(194,58,46,.12);border:4px solid var(--bad);font-family:var(--f-display);font-weight:800;font-size:34px;color:var(--bad)}
+.link{font-size:24px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px}
+.link b{font-size:44px;color:var(--orange)}
+.steps{position:absolute;left:80px;right:80px;bottom:80px;display:flex;gap:16px}
+.step{flex:1;background:var(--white);border-radius:12px;padding:16px 20px;font-size:24px;display:flex;gap:14px;align-items:center;border:2px solid var(--line)}
+.step b{flex:none;width:40px;height:40px;border-radius:50%;background:var(--navy);color:var(--white);display:grid;place-items:center;font-family:var(--f-display)}
+
+/* talonario */
+.tal{position:absolute;left:80px;top:300px;width:600px;background:var(--white);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tal .tt{background:var(--navy);color:var(--white);font-weight:700;padding:12px 20px;font-size:20px}
+.tal .row{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-top:1px solid var(--line);font-size:22px}
+.tal .row span{color:var(--muted)}
+.field{font-family:var(--f-mono);font-size:30px;border:3px solid var(--line);border-radius:8px;padding:4px 12px;background:var(--white);position:relative;min-width:230px;text-align:right}
+.field.hl{border-color:var(--orange)}
+.field .old{position:absolute;inset:0;padding:4px 12px;background:var(--white);transition:opacity .5s;border-radius:6px}
+.field.chg .old{opacity:0}
+.tal-ex{position:absolute;left:730px;right:80px;top:300px;display:flex;flex-direction:column;gap:14px}
+.nb{display:flex;align-items:center;gap:14px;font-size:24px}
+.nb .n{font-family:var(--f-mono);font-size:30px;padding:8px 14px;border-radius:10px;background:var(--white);border:2px solid var(--line);min-width:200px;text-align:center}
+.nb .n.del{border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.nb .n.next{border-color:var(--ok);color:var(--ok);font-weight:700}
+.mini-route{position:absolute;left:80px;top:220px;display:flex;gap:10px;align-items:center;font-size:24px;font-weight:700;color:var(--navy)}
+.mini-route i{font-style:normal;color:var(--orange)}
+.mini-route span{background:var(--white);border:2px solid var(--navy);border-radius:10px;padding:6px 14px}
+
+/* check list */
+.checks{position:absolute;left:80px;right:80px;top:290px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.chk{background:var(--white);border-radius:16px;padding:26px;border-top:8px solid var(--ok);min-height:260px;display:flex;flex-direction:column;gap:10px}
+.chk.w{border-top-color:var(--orange)}
+.chk .st{font-family:var(--f-display);font-weight:800;font-size:40px;line-height:1}
+.chk.g .st{color:var(--ok)}.chk.w .st{color:var(--orange)}
+.chk p{margin:0;font-size:24px;line-height:1.3}
+
+/* resumen */
+.sum{position:absolute;left:80px;right:80px;top:230px;display:flex;flex-direction:column;gap:14px}
+.sum .row{display:grid;grid-template-columns:330px 1fr;gap:0;background:var(--white);border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.sum .row b{background:var(--navy);color:var(--white);font-family:var(--f-display);font-size:28px;padding:18px 22px;display:flex;align-items:center}
+.sum .row span{padding:16px 24px;font-size:24px;line-height:1.3;display:flex;align-items:center}
+.sum .row span em{font-style:normal;font-weight:700;color:var(--orange)}
+.end-cta{position:absolute;right:80px;bottom:60px}
+
+/* movimiento reducido */
+@media (prefers-reduced-motion:reduce){
+  .sc,.rv,.layer,.cursor,.mark,.ledger .strike{animation:none!important;transition:none!important}
+}
+
+/* pantalla completa de captura y columna lateral */
+.sc.full .wm,.sc.full .chl{display:none}
+.split-text{position:absolute;left:56px;top:96px;width:460px}
+.split-text .h.m{font-size:40px}
+.side-list{list-style:none;margin:26px 0 0;padding:0;display:flex;flex-direction:column;gap:14px;font-size:24px;line-height:1.28}
+.side-list li{padding-left:22px;position:relative}
+.side-list li::before{content:"";position:absolute;left:0;top:10px;width:10px;height:10px;border-radius:2px;background:var(--orange)}
+.side-list b{color:var(--navy)}
+.kbd{font-family:var(--f-mono);background:var(--white);border:2px solid var(--line);border-bottom-width:4px;border-radius:8px;padding:0 10px}
+.art-lines .ln{height:14px;border-radius:7px;background:var(--line);margin:10px 0}
+.flow{position:absolute;left:80px;right:80px;top:300px;display:flex;align-items:stretch;gap:14px}
+.flow .fs{flex:1;background:var(--white);border:2px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.flow .fs b{font-family:var(--f-display);font-size:26px;color:var(--navy);line-height:1.05}
+.flow .fs span{font-size:19px;color:var(--muted);line-height:1.25}
+.flow .fs i{font-style:normal;font-family:var(--f-mono);font-size:15px;color:var(--orange);font-weight:700}
+.flow .fs.hl{border-color:var(--orange);background:var(--orange-soft)}
+.cmp{position:absolute;left:80px;right:80px;top:270px;display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.cmp .col{background:var(--white);border-radius:16px;padding:26px;border-top:8px solid var(--ok);display:flex;flex-direction:column;gap:12px}
+.cmp .col.no{border-top-color:var(--bad)}
+.cmp .col h4{margin:0;font-family:var(--f-display);font-size:34px;color:var(--navy);line-height:1.05}
+.cmp .col p{margin:0;font-size:23px;line-height:1.3}
+.cmp .col .v{font-family:var(--f-display);font-weight:800;font-size:24px;letter-spacing:.06em;text-transform:uppercase}
+.cmp .col .v.ok{color:var(--ok)}.cmp .col .v.no{color:var(--bad)}
+.calc{position:absolute;left:80px;top:290px;width:560px;background:var(--white);border-radius:14px;border:1px solid var(--line);font-size:26px;font-variant-numeric:tabular-nums;overflow:hidden}
+.calc .l{display:flex;justify-content:space-between;padding:12px 22px;border-top:1px solid var(--line)}
+.calc .l:first-child{border-top:0}
+.calc .l.t{background:var(--navy);color:var(--white);font-weight:700}
+.calc .l.d{background:var(--orange-soft);color:#9A3D06;font-weight:700}
+.cols4{position:absolute;left:700px;right:80px;top:290px;display:flex;flex-direction:column;gap:10px}
+.cols4 .c{display:flex;align-items:center;gap:14px;background:var(--white);border-radius:12px;border:2px solid var(--line);padding:10px 16px;font-size:22px}
+.cols4 .c b{font-family:var(--f-mono);font-size:24px;background:var(--navy);color:var(--white);border-radius:8px;padding:2px 12px}
+.cols4 .c i{font-style:normal;margin-left:auto;font-family:var(--f-mono);color:var(--orange);font-weight:700}
+/* modo de captura (solo para revisión interna) */
+body.cap{padding:0}
+body.cap .top,body.cap .head,body.cap .side,body.cap .quiz,body.cap .foot,body.cap .subs,body.cap .bar,body.cap .ctrl{display:none}
+body.cap .layout{display:block;max-width:none}
+body.cap .player{border-radius:0}
+body.cap *{animation:none!important;transition:none!important}
+
+/* enlace de regreso y recursos */
+.top-r{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.back{font-size:14px;font-weight:700;color:var(--navy);text-decoration:none;border:1px solid var(--line);background:var(--white);padding:5px 12px;border-radius:99px}
+.back:hover{border-color:var(--navy)}
+.rec{border-top:1px solid var(--line);padding:8px 0}
+.rec:first-child{border-top:0}
+.rec summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--navy)}
+.rec pre{white-space:pre-wrap;font-family:var(--f-mono);font-size:11.5px;line-height:1.45;background:var(--paper);border-radius:8px;padding:10px;margin:8px 0;max-height:260px;overflow:auto}
+.copy{border:0;border-radius:8px;background:var(--orange);color:var(--white);font-weight:700;padding:6px 12px;font-size:13px}
+/* maqueta de chat */
+.chat{position:absolute;left:560px;right:60px;top:96px;bottom:70px;background:#FAF9F5;border-radius:16px;border:1px solid var(--line);box-shadow:0 20px 50px -24px rgba(10,31,61,.4);display:flex;flex-direction:column;overflow:hidden;font-size:17px}
+.chat .bar2{height:40px;background:#F0EEE6;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 14px;gap:8px;font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.chat .bar2 i{width:10px;height:10px;border-radius:50%;background:#D8D4C8}
+.chat .body{flex:1;padding:20px 24px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.msg{max-width:88%;border-radius:14px;padding:12px 16px;line-height:1.35}
+.msg.u{align-self:flex-end;background:#E8E4D8}
+.msg.a{align-self:flex-start;background:var(--white);border:1px solid var(--line)}
+.msg .files{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.file{display:inline-flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:14px;font-weight:600}
+.file b{font-family:var(--f-mono);font-size:11px;color:var(--white);border-radius:4px;padding:1px 5px}
+.file b.x{background:#1D8A57}.file b.z{background:#7A5AF8}.file b.p{background:#C23A2E}
+.compose{margin:0 18px 18px;border:1px solid var(--line);border-radius:14px;background:var(--white);padding:12px 14px;display:flex;align-items:center;gap:10px;color:var(--muted)}
+.compose .clip{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;font-size:18px}
+.compose .send{margin-left:auto;width:34px;height:34px;border-radius:10px;background:#C96442;color:#fff;display:grid;place-items:center}
+.tbl{border-collapse:collapse;font-size:14px;width:100%;margin-top:6px;font-variant-numeric:tabular-nums}
+.tbl th,.tbl td{border:1px solid var(--line);padding:4px 8px;text-align:left}
+.tbl th{background:var(--paper)}
+.tbl .bad{color:var(--bad);font-weight:700}
+.login{position:absolute;left:640px;top:130px;width:500px;background:var(--white);border-radius:18px;border:1px solid var(--line);padding:34px;box-shadow:0 20px 50px -24px rgba(10,31,61,.4);display:flex;flex-direction:column;gap:14px;align-items:stretch;text-align:center}
+.login h5{margin:0;font-family:Georgia,serif;font-weight:400;font-size:34px;color:#3D3929}
+.login .g{border:1px solid var(--line);border-radius:10px;padding:12px;font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center;gap:10px}
+.login .g.hl{border:3px solid var(--orange)}
+.login .or{font-size:14px;color:var(--muted)}
+.login .em{border:1px solid var(--line);border-radius:10px;padding:12px;color:var(--muted);text-align:left}
+.cal{position:absolute;left:80px;right:80px;top:250px;display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.cal .d{background:var(--white);border:1px solid var(--line);border-radius:10px;height:74px;padding:6px 10px;font-size:15px;color:var(--muted);position:relative}
+.cal .d b{position:absolute;left:8px;right:8px;bottom:8px;border-radius:6px;padding:3px 6px;font-size:14px;color:var(--white);background:var(--navy)}
+.cal .d.v b{background:var(--bad)}
+.cal .d.ok b{background:var(--ok)}
+.cal .hd{text-align:center;font-weight:700;font-size:14px;color:var(--muted);letter-spacing:.1em}
+.flow .fs span b{font:inherit;font-weight:700;color:var(--navy)}
+.flow.caso{top:270px}
+.flow.caso .fs{padding:24px;min-height:250px}
+.flow.caso .fs span{font-size:25px!important;line-height:1.3;color:var(--ink)}
+.flow.caso .fs i{font-size:17px}
+
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand"><span class="mk">EMA</span><div>Estudio Miguel Alonso<small>Tutoriales internos</small></div></div>
+  <div class="top-r"><a class="back" href="../index.html">← Onboarding Contabilidad</a><span class="tag">Claude · Control de calidad</span></div>
+</header>
+
+<section class="head">
+  <h1>Revisión de subdiarios con Claude</h1>
+  <p>Cómo ingresar a Claude con la cuenta del equipo y usarlo para comparar el libro de IVA Ventas contra ARCA, y el de IVA Compras contra los PDFs. Con prompts listos para copiar.</p>
+</section>
+
+<div class="layout">
+  <div class="player" id="player">
+    <div class="screen" id="screen">
+      <div class="stage" id="stage" aria-live="off"></div>
+      <button class="poster" id="poster" type="button" aria-label="Reproducir el tutorial"><span><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></span></button>
+    </div>
+    <div class="subs" id="subs" aria-live="polite"></div>
+    <div class="bar" id="bar" role="slider" aria-label="Progreso del tutorial" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="fill" id="fill"></div></div>
+    <div class="ctrl">
+      <button type="button" id="play"></button>
+      <button type="button" id="prev" aria-label="Escena anterior"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+      <button type="button" id="next" aria-label="Escena siguiente"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5l11 7-11 7z"/></svg></button>
+      <span class="time" id="time">0:00</span>
+      <span class="chname" id="chname"></span>
+      <span class="sp"></span>
+      <button type="button" class="chip" id="voz" aria-pressed="true" title="Narración con voz"><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4zM16 8.5a5 5 0 010 7l-1.4-1.4a3 3 0 000-4.2zM18.8 5.7a9 9 0 010 12.6l-1.4-1.4a7 7 0 000-9.8z"/></svg><span>Voz</span></button>
+      <button type="button" class="chip" id="cc" aria-pressed="true" title="Subtítulos"><svg viewBox="0 0 24 24"><path d="M3 5h18v14H3zm2 2v10h14V7zm2 3h4v1.5H8.5v1h2.5V14H7zm6 0h4v1.5h-2.5v1H17V14h-4z"/></svg><span>Subtítulos</span></button>
+      <button type="button" id="vel" title="Velocidad">1×</button>
+      <button type="button" id="fs" aria-label="Pantalla completa"><svg viewBox="0 0 24 24"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg></button>
+    </div>
+  </div>
+
+  <aside class="side">
+    <div class="box">
+      <h3>Capítulos</h3>
+      <ol class="chapters" id="chapters"></ol>
+    </div>
+    <div class="box" id="recursos" hidden>
+      <h3>Para copiar</h3>
+      <div id="reclist"></div>
+    </div>
+    <div class="box">
+      <h3>Cómo usarlo</h3>
+      <p class="help">Tocá la pantalla o <kbd>Espacio</kbd> para pausar. <kbd>←</kbd> <kbd>→</kbd> saltan de escena. Al terminar el video se habilita el test.</p>
+    </div>
+  </aside>
+</div>
+
+<section class="quiz" id="quiz" aria-label="Test final"></section>
+
+<footer class="foot"><span>© Estudio Miguel Alonso · Material de capacitación interna</span><span>Proceso interno de Contabilidad</span></footer>
+
+<script>
+const IMG = {};
+/* Plantillas de escena para los tutoriales.
+   Las cajas [x, y, ancho, alto] van en fracciones (0 a 1) de la captura original. */
+const E = (() => {
+  const ICONOS = {
+    doc: '<svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h8M9 17h5"/></svg>',
+    lista: '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h4"/></svg>',
+    x: '<svg viewBox="0 0 24 24"><path d="M6 2h12v20H6z"/><path d="M9 9l6 6M15 9l-6 6"/></svg>',
+    llave: '<svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/></svg>',
+    usuario: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>',
+    edificio: '<svg viewBox="0 0 24 24"><path d="M4 21V5l8-3v19M12 8h8v13M8 8h.01M8 12h.01M8 16h.01M16 12h.01M16 16h.01M2 21h20"/></svg>',
+    excel: '<svg viewBox="0 0 24 24"><path d="M4 3h16v18H4z"/><path d="M4 9h16M4 15h16M10 3v18"/></svg>',
+    pdf: '<svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M12 11v6M9 14l3 3 3-3"/></svg>',
+    lupa: '<svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="M15 15l6 6"/></svg>',
+    reloj: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    carpeta: '<svg viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3z"/></svg>',
+    check: '<svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>',
+    engranaje: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>',
+    subir: '<svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>',
+    persona2: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.7-3.5 3-5 6-5s5.3 1.5 6 5M15 15c3 0 5 1.5 6 4"/></svg>',
+  };
+  const esc = (s) => s;
+  const pad = (b, m = 0.05) => {
+    const x = Math.max(0, b[0] - m), y = Math.max(0, b[1] - m * 1.6);
+    return [x, y, Math.min(1, b[0] + b[2] + m) - x, Math.min(1, b[1] + b[3] + m * 1.6) - y];
+  };
+  const centro = (b) => [b[0] + b[2] * 0.5, b[1] + b[3] * 0.55];
+  const reveal = (s) => (s == null ? "" : ` rv" data-s="${s}`);
+
+  function titulo({ ch = 0, sistema, titulo, narr, tags = [], arte = "" }) {
+    return { ch, cls: "dark", narr,
+      html: `<div class="t-band"></div><div class="t-band2"></div>
+        <div class="pad" style="top:160px;right:520px">
+          <div class="eyebrow" style="color:var(--orange-2)">Tutorial · ${sistema}</div>
+          <h2 class="h xl" style="font-size:${titulo.length > 26 ? 76 : 92}px">${titulo}</h2>
+          <div class="t-meta">${tags.map((t, i) => `<span class="pill ${i ? "w" : "o"}${i ? reveal(narr.length - 1) : ""}">${t}</span>`).join("")}</div>
+        </div>
+        <div class="t-card">${arte}</div>` };
+  }
+
+  function texto({ ch, eyebrow, titulo, items = [], narr, desde = 1, tam = "l", extra = "" }) {
+    return { ch, narr,
+      html: `<div class="pad"><div class="eyebrow">${eyebrow}</div><h2 class="h ${tam}">${titulo}</h2>
+        <ul class="big-list">${items.map((it, i) => {
+          const o = typeof it === "string" ? { t: it, s: Math.min(i + desde, narr.length - 1) } : it;
+          return `<li class="rv" data-s="${o.s}"><span>${o.t}</span></li>`; }).join("")}</ul></div>${extra}` };
+  }
+
+  function tarjetas({ ch, eyebrow, titulo, cards, narr, desde = 1 }) {
+    return { ch, narr,
+      html: `<div class="pad"><div class="eyebrow">${eyebrow}</div><h2 class="h l">${titulo}</h2></div>
+        <div class="cases" style="grid-template-columns:repeat(${cards.length},1fr);${cards.length > 3 ? "gap:18px" : ""}">
+        ${cards.map((c, i) => `<div class="case rv" data-s="${c.s ?? i + desde}"><div class="ic">${ICONOS[c.ic || "doc"]}</div>
+          <h4 style="${cards.length > 3 ? "font-size:27px" : ""}">${c.t}</h4><p style="${cards.length > 3 ? "font-size:20px" : ""}">${c.p}</p>${c.k ? `<span class="k">${c.k}</span>` : ""}</div>`).join("")}
+        </div>` };
+  }
+
+  function ruta({ ch, eyebrow, titulo, pasos, narr, nota = "", s = null }) {
+    return { ch, narr,
+      html: `<div class="pad"><div class="eyebrow">${eyebrow}</div><h2 class="h l">${titulo}</h2></div>
+        <div class="route">${pasos.map((p, i) => {
+          const r = s ? s[i] : null;
+          return (i ? `<span class="arrow${reveal(r)}">›</span>` : "") +
+            `<span class="crumb${i === pasos.length - 1 ? " act" : ""}${reveal(r)}">${p}</span>`; }).join("")}</div>
+        ${nota ? `<div class="route-note rv" data-s="${narr.length - 1}">${nota}</div>` : ""}` };
+  }
+
+  function alerta({ ch, eyebrow = "Importante", titulo, texto: t = "", narr, pie = "", simbolo = "!" }) {
+    return { ch, cls: "warm", narr,
+      html: `<div class="pad" style="right:460px"><div class="eyebrow">${eyebrow}</div>
+        <h2 class="h l">${titulo}</h2>${t ? `<p class="rv" data-s="1" style="font-size:30px;margin:22px 0 0;line-height:1.3">${t}</p>` : ""}</div>
+        <div class="alert-ic">${simbolo}</div>${pie ? `<div class="nc rv" data-s="${narr.length - 1}">${pie}</div>` : ""}` };
+  }
+
+  /* Captura con zoom, marcas y cursor.
+     pasos: { índiceDeFrase: { b: caja, z: caja|null (zoom; por defecto la caja ampliada), clic: false | [x,y], m: false } } */
+  function captura({ ch, eyebrow = "", titulo = "", img, narr, url, pasos = {}, layout = "wide", lado = "", overlay = "", extra = "" }) {
+    const focus = {}, marks = [], click = {};
+    const keys = Object.keys(pasos).map(Number).sort((a, b) => a - b);
+    keys.forEach((k, idx) => {
+      const p = pasos[k], until = idx < keys.length - 1 ? keys[idx + 1] - 1 : 99;
+      if ("z" in p) focus[k] = p.z; else if (p.b) focus[k] = pad(p.b, p.pad ?? 0.05);
+      const bs = p.bs || (p.b ? [p.b] : []);
+      if (p.m !== false) bs.forEach((b) => marks.push({ s: k, until, box: b }));
+      if (p.clic !== false && (p.clic || p.b)) click[k] = p.clic || centro(p.b);
+    });
+    let frame, head = "", cls = "light";
+    if (layout === "full") { frame = [28, 22, 1224, 676]; cls = "light full"; }
+    else if (layout === "split") {
+      frame = [548, 96, 704, 560];
+      head = `<div class="split-text"><div class="eyebrow">${eyebrow}</div><h2 class="h m">${titulo}</h2>${lado}</div>`;
+    } else {
+      frame = [60, 132, 1160, 552];
+      head = `<div class="shot-h"><div class="eyebrow">${eyebrow}</div><h2 class="h">${titulo}</h2></div>`;
+    }
+    return { ch, cls, narr, html: head + extra,
+      shot: { img, frame, url: url || (typeof TUT_URL !== "undefined" ? TUT_URL : ""), alt: titulo, focus, marks, click, overlay } };
+  }
+
+  function lista(items, desde = 1) {
+    return `<ul class="side-list">${items.map((it, i) => {
+      const o = typeof it === "string" ? { t: it, s: i + desde } : it;
+      return `<li class="rv" data-s="${o.s}">${o.t}</li>`; }).join("")}</ul>`;
+  }
+
+  function resumen({ ch, titulo = "Un repaso rápido", filas, narr, cta = "Siguiente: test final ✓", desde = 1 }) {
+    return { ch, narr,
+      html: `<div class="pad"><div class="eyebrow">Resumen</div><h2 class="h m">${titulo}</h2></div>
+        <div class="sum" style="top:${filas.length > 5 ? 180 : filas.length > 4 ? 200 : 230}px;gap:${filas.length > 4 ? 10 : 14}px">${filas.map((f, i) =>
+          `<div class="row rv" data-s="${f[2] ?? i + desde}"><b style="${filas.length > 4 ? "font-size:24px;padding:12px 22px" : ""}">${f[0]}</b><span style="${filas.length > 4 ? "font-size:21px;padding:10px 22px" : ""}">${f[1]}</span></div>`).join("")}</div>
+        <div class="end-cta rv" data-s="${narr.length - 1}" style="${filas.length > 5 ? "bottom:18px" : ""}"><span class="pill o" style="font-size:26px;padding:12px 26px">${cta}</span></div>` };
+  }
+
+  return { titulo, texto, tarjetas, ruta, alerta, captura, lista, resumen, ICONOS, pad };
+})();
+
+/* Tutorial: Revisión de subdiarios con Claude */
+const PROMPT_VENTAS = `Sos un asistente contable. Te adjunto dos archivos de la empresa [NOMBRE DEL CLIENTE], período [MES/AÑO]:
+1) El Excel de Comprobantes Emitidos descargado de ARCA (Mis Comprobantes).
+2) El Libro de IVA Ventas generado en Onvio.
+
+Compará los dos archivos comprobante por comprobante y verificá:
+- Que estén TODOS los comprobantes de ARCA en el libro, y que el libro no tenga comprobantes que no estén en ARCA.
+- Que coincidan: fecha de emisión, tipo y letra, punto de venta, número, CUIT/documento del cliente, neto gravado, no gravado/exento, IVA (por alícuota), percepciones y total.
+- Que estén todos los puntos de venta y que no falten números en la secuencia de cada punto de venta.
+- Que no haya comprobantes duplicados.
+- Que todas las fechas correspondan al período.
+- Que las notas de crédito resten (importes con el signo correcto).
+- Cualquier otra cosa rara: importes en cero, tipos de cambio extraños, moneda extranjera, clientes sin CUIT.
+
+Respondé con:
+1) Un resumen: cantidad de comprobantes y total en cada archivo, y la diferencia.
+2) Una tabla SOLO con las diferencias: comprobante (tipo, PV, número), dato, valor en ARCA, valor en el libro.
+3) Una lista de faltantes y sobrantes.
+Si no encontrás diferencias, decilo explícitamente. No inventes datos: si algo no se puede leer, avisame.`;
+
+const PROMPT_COMPRAS = `Sos un asistente contable. Te adjunto, de la empresa [NOMBRE DEL CLIENTE], período [MES/AÑO]:
+1) El Libro de IVA Compras generado en Onvio.
+2) Un archivo ZIP con los comprobantes de compra en PDF.
+
+Abrí cada PDF y comparalo con su línea del libro. Verificá:
+- Que cada PDF esté en el libro y que cada línea del libro tenga su PDF.
+- Que coincidan: fecha de emisión, tipo y letra, punto de venta, número, CUIT y razón social del proveedor, neto gravado (por alícuota), no gravado, exento, IVA, cada percepción o retención (IVA, IIBB por jurisdicción, otras) y total.
+- Que las percepciones estén en el régimen/jurisdicción correcto.
+- Que no haya comprobantes duplicados.
+- Que las fechas correspondan al período (o avisame si hay comprobantes de meses anteriores).
+- Que las notas de crédito resten.
+- Que el CUIT del proveedor no sea el de nuestra propia empresa cliente.
+- Cualquier cosa rara: facturas en dólares y su tipo de cambio, comprobantes ilegibles, facturas B o C con IVA discriminado.
+
+Respondé con:
+1) Un resumen: cantidad de PDFs, cantidad de líneas del libro y totales.
+2) Una tabla SOLO con las diferencias: archivo PDF, comprobante, dato, valor en el PDF, valor en el libro.
+3) Una lista de PDFs sin línea en el libro y de líneas sin PDF.
+Si no encontrás diferencias, decilo explícitamente. No inventes datos: si un PDF no se puede leer, avisame cuál.`;
+
+const PROMPT_REPREGUNTA = `Revisá de nuevo solo el comprobante [TIPO PV-NÚMERO]. Mostrame, lado a lado, los valores que leíste en cada archivo y explicame de dónde sale la diferencia.`;
+
+const TUT = {
+  id: "revision-claude",
+  chapters: ["Bienvenida", "Ingresar a Claude", "Revisar ventas", "Revisar compras", "Buenas prácticas", "Resumen"],
+  recursos: [
+    { t: "Prompt · Ventas (ARCA vs. Libro IVA Ventas)", texto: PROMPT_VENTAS },
+    { t: "Prompt · Compras (Libro IVA Compras vs. PDFs)", texto: PROMPT_COMPRAS },
+    { t: "Prompt · Repreguntar una diferencia", texto: PROMPT_REPREGUNTA },
+  ],
+  scenes: [
+    E.titulo({ ch: 0, sistema: "Claude", titulo: "Revisión de subdiarios con Claude",
+      tags: ["Ventas y Compras", "+ test final"],
+      narr: [
+        "Hola. En este tutorial vas a aprender a usar Claude, la inteligencia artificial del equipo, para controlar tus subdiarios antes de enviarlos.",
+        "Los prompts que vas a ver están en el panel «Para copiar», al costado del video. Al final, hay un test.",
+      ],
+      arte: `<div style="font-weight:700;font-size:20px;color:var(--navy)">Control del subdiario</div>
+        <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap"><span class="file"><b class="x">XLS</b>ARCA</span><span class="file"><b class="x">XLS</b>Libro IVA</span></div>
+        <div style="margin-top:12px;background:var(--paper);border-radius:10px;padding:10px;font-size:15px">✓ 46 de 47 coinciden<br><b style="color:var(--bad)">✗ 1 diferencia de fecha</b></div>` }),
+    E.texto({ ch: 0, eyebrow: "Para qué sirve", titulo: "Un control más rápido y más completo",
+      narr: [
+        "Comparar a mano cientos de comprobantes lleva mucho tiempo, y es fácil que algo se escape.",
+        "Claude puede leer el Excel de ARCA, el libro de IVA y los PDFs, y compararlos línea por línea.",
+        "Te devuelve solo las diferencias, para que te concentres en lo que hay que revisar.",
+        "Pero ojo: Claude es una ayuda. Cada diferencia que marque, la verificás vos en el sistema antes de corregir.",
+      ],
+      items: [
+        "Comparar a mano es lento y se escapan cosas.",
+        "Claude compara <b>línea por línea</b>.",
+        "Te muestra <b>solo las diferencias</b>.",
+        "Vos <b>verificás</b> cada diferencia antes de corregir.",
+      ] }),
+
+    /* ---------- Ingreso ---------- */
+    { ch: 1, narr: [
+        "Primero, ingresá a Claude.",
+        "Abrí el navegador y entrá a claude.ai.",
+        "Elegí «Continuar con Google» e ingresá con la cuenta de Google del estudio que tiene acceso al equipo de Claude.",
+        "No uses una cuenta personal: la información de los clientes tiene que quedar dentro de la cuenta del equipo.",
+      ],
+      html: `<div class="split-text"><div class="eyebrow">Ingreso</div><h2 class="h m">Entrá con la cuenta del equipo</h2>
+        ${E.lista(["Entrá a <b>claude.ai</b>.", "<b>Continuar con Google</b>.", "Usá la cuenta del estudio con acceso al equipo, <b>nunca una personal</b>."])}</div>
+        <div class="login"><div style="font-family:var(--f-mono);font-size:14px;color:var(--muted)">claude.ai</div><h5>Te damos la bienvenida</h5>
+          <div class="g rv hl" data-s="2"><svg width="22" height="22" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.6 13.2l7.8 6C12.3 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17.5z"/><path fill="#FBBC05" d="M10.4 28.8A14.5 14.5 0 0 1 9.5 24c0-1.7.3-3.3.9-4.8l-7.8-6A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.8-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.7-4.1-13.6-9.8l-7.8 6C6.6 42.6 14.6 48 24 48z"/></svg>Continuar con Google</div>
+          <div class="or">o</div><div class="em">Ingresá tu email</div>
+          <div class="callout rv" data-s="3" style="position:static;max-width:none;background:var(--bad);font-size:18px">Solo la cuenta del estudio con acceso al equipo</div></div>` },
+    { ch: 1, narr: [
+        "Una vez adentro, empezá un chat nuevo para cada subdiario, así no se mezcla la información de distintos clientes.",
+        "Con el clip del cuadro de mensaje adjuntás los archivos.",
+        "Y en el cuadro escribís, o pegás, el prompt: las instrucciones de lo que querés que haga.",
+      ],
+      html: `<div class="split-text"><div class="eyebrow">El chat</div><h2 class="h m">Un chat nuevo por subdiario</h2>
+        ${E.lista(["<b>Chat nuevo</b> para cada cliente y libro.", "El <b>clip</b> adjunta archivos.", "El <b>prompt</b> dice qué tiene que hacer."], 0)}</div>
+        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Nuevo chat</span></div>
+          <div class="body"><div style="margin:auto;text-align:center;font-family:Georgia,serif;font-size:34px;color:#3D3929">¿En qué puedo ayudarte hoy?</div></div>
+          <div class="compose"><span class="clip rv" data-s="1" style="border:3px solid var(--orange)">📎</span><span class="rv" data-s="2">Pegá acá el prompt…</span><span class="send">↑</span></div></div>` },
+
+    /* ---------- Ventas ---------- */
+    { ch: 2, narr: [
+        "Empecemos por las ventas.",
+        "Adjuntá dos archivos: el Excel de Comprobantes Emitidos que bajaste de ARCA, y el libro de IVA Ventas que generaste en Onvio.",
+        "Pegá el prompt de ventas, reemplazando el nombre del cliente y el período, y envialo.",
+      ],
+      html: `<div class="split-text"><div class="eyebrow">Ventas</div><h2 class="h m">ARCA contra el libro</h2>
+        ${E.lista(["<b>Excel de Emitidos</b> de ARCA.", "<b>Libro IVA Ventas</b> de Onvio.", "Prompt de ventas, con cliente y período."])}</div>
+        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Cliente A · Ventas 07/2026</span></div>
+          <div class="body"><div class="msg u rv" data-s="1"><div class="files"><span class="file"><b class="x">XLSX</b>Mis Comprobantes Emitidos 07-2026</span><span class="file"><b class="x">XLSX</b>Libro IVA Ventas 07-2026</span></div>
+            <span class="rv" data-s="2">Sos un asistente contable. Te adjunto dos archivos de la empresa <b>Cliente A</b>, período <b>07/2026</b>… Compará los dos archivos comprobante por comprobante y verificá…</span></div></div>
+          <div class="compose"><span class="clip">📎</span><span>Responder…</span><span class="send">↑</span></div></div>` },
+    E.texto({ ch: 2, eyebrow: "Qué pedirle en ventas", titulo: "Los puntos que no pueden faltar", tam: "m",
+      narr: [
+        "Un buen prompt de ventas le pide a Claude que mire, como mínimo, estos puntos.",
+        "Que estén todos los comprobantes en los dos archivos: que no falte ni sobre ninguno.",
+        "Que coincidan la fecha de emisión, el tipo, el punto de venta y el número.",
+        "Que estén todos los puntos de venta, y que no haya saltos en la numeración.",
+        "Que coincidan los importes: neto, IVA, percepciones y total. Y que las notas de crédito resten.",
+        "Y que avise de cualquier cosa rara: duplicados, importes en cero, moneda extranjera o fechas fuera del período.",
+      ],
+      items: [
+        "Todos los comprobantes: <b>ni faltantes ni sobrantes</b>.",
+        "<b>Fecha de emisión</b>, tipo, <b>punto de venta</b> y número.",
+        "Todos los <b>puntos de venta</b>, sin saltos de numeración.",
+        "Neto, IVA, percepciones y total · <b>NC restando</b>.",
+        "Cualquier cosa rara: duplicados, ceros, moneda, fechas.",
+      ] }),
+    { ch: 2, narr: [
+        "Claude responde con un resumen y una tabla con las diferencias.",
+        "En este ejemplo, encontró una fecha distinta y un comprobante que está en ARCA pero falta en el libro.",
+        "Tu trabajo ahora es verificar cada diferencia en Onvio y en ARCA, y corregir lo que corresponda.",
+      ],
+      html: `<div class="split-text"><div class="eyebrow">La respuesta</div><h2 class="h m">Solo las diferencias</h2>
+        ${E.lista(["Resumen con cantidades y totales.", "Tabla de <b>diferencias</b> y <b>faltantes</b>.", "Vos <b>verificás</b> y corregís en Onvio."])}</div>
+        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Cliente A · Ventas 07/2026</span></div>
+          <div class="body"><div class="msg a">
+            <b>Resumen:</b> ARCA tiene <b>47</b> comprobantes ($ 58.412.300,00); el libro tiene <b>46</b> ($ 58.290.000,00). Diferencia: $ 122.300,00.
+            <table class="tbl rv" data-s="1"><tr><th>Comprobante</th><th>Dato</th><th>ARCA</th><th>Libro</th></tr>
+              <tr><td>FC A 0010-00003086</td><td>Fecha</td><td>26/07/2026</td><td class="bad">27/07/2026</td></tr>
+              <tr><td>FC A 0010-00003071</td><td>Presencia</td><td>$ 122.300,00</td><td class="bad">Falta</td></tr></table>
+            <div class="rv" data-s="1" style="margin-top:8px">Los puntos de venta 0010 y 0015 están completos, sin saltos. No hay duplicados.</div>
+          </div></div>
+          <div class="compose"><span class="clip">📎</span><span>Responder…</span><span class="send">↑</span></div></div>` },
+
+    /* ---------- Compras ---------- */
+    { ch: 3, narr: [
+        "Ahora, las compras. Acá la comparación es distinta: el libro se controla contra los comprobantes reales.",
+        "Juntá todos los PDFs de las facturas de compra del período en un archivo ZIP: seleccionalos, clic derecho, y «Comprimir en archivo ZIP».",
+        "Adjuntá el libro de IVA Compras de Onvio y el ZIP con los PDFs, pegá el prompt de compras y envialo.",
+      ],
+      html: `<div class="split-text"><div class="eyebrow">Compras</div><h2 class="h m">El libro contra los PDFs</h2>
+        ${E.lista(["PDFs del período en un <b>ZIP</b>.", "<b>Libro IVA Compras</b> de Onvio.", "Prompt de compras."])}</div>
+        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Cliente A · Compras 07/2026</span></div>
+          <div class="body"><div class="msg u rv" data-s="2"><div class="files"><span class="file"><b class="x">XLSX</b>Libro IVA Compras 07-2026</span><span class="file"><b class="z">ZIP</b>Comprobantes compras 07-2026 (38 PDF)</span></div>
+            Sos un asistente contable. Te adjunto, de la empresa <b>Cliente A</b>, período <b>07/2026</b>… Abrí cada PDF y comparalo con su línea del libro…</div>
+          <div class="rv" data-s="1" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:auto">${Array.from({ length: 8 }, (_, i) => `<span class="file"><b class="p">PDF</b>FC_${3300 + i}.pdf</span>`).join("")}<span class="file">→ <b class="z">ZIP</b></span></div></div>
+          <div class="compose"><span class="clip">📎</span><span>Responder…</span><span class="send">↑</span></div></div>` },
+    E.texto({ ch: 3, eyebrow: "Qué pedirle en compras", titulo: "Además de lo de ventas…", tam: "m",
+      narr: [
+        "En compras, además de los puntos de ventas, pedile que controle esto.",
+        "Que cada PDF tenga su línea en el libro, y que cada línea tenga su PDF.",
+        "Que cada percepción esté en el régimen y la jurisdicción correctos, por ejemplo Ingresos Brutos CABA o Provincia.",
+        "Que el CUIT del proveedor no sea el de nuestra propia empresa cliente.",
+        "Y que avise si hay facturas en dólares, comprobantes ilegibles o comprobantes de meses anteriores.",
+      ],
+      items: [
+        "Cada <b>PDF</b> con su línea, y cada línea con su PDF.",
+        "Percepciones en el <b>régimen y jurisdicción</b> correctos.",
+        "El proveedor <b>nunca</b> es nuestro propio cliente.",
+        "Dólares, ilegibles y comprobantes de otros meses.",
+      ] }),
+    { ch: 3, narr: [
+        "La respuesta tiene el mismo formato: un resumen y la tabla de diferencias.",
+        "En este caso, encontró una percepción de Ingresos Brutos cargada en la jurisdicción equivocada, y un PDF que no está en el libro.",
+        "Si una diferencia no te cierra, repreguntale sobre ese comprobante en particular: tenés el prompt para repreguntar en el panel lateral.",
+      ],
+      html: `<div class="split-text"><div class="eyebrow">La respuesta</div><h2 class="h m">Diferencias por PDF</h2>
+        ${E.lista(["Percepción en la jurisdicción equivocada.", "PDF sin línea en el libro.", "Si no te cierra: <b>repreguntá</b>."])}</div>
+        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Cliente A · Compras 07/2026</span></div>
+          <div class="body"><div class="msg a">
+            <b>Resumen:</b> 38 PDFs y 37 líneas en el libro.
+            <table class="tbl rv" data-s="1"><tr><th>PDF</th><th>Dato</th><th>PDF</th><th>Libro</th></tr>
+              <tr><td>FC_3302.pdf</td><td>Perc. IIBB</td><td>CABA $ 4.500</td><td class="bad">PBA $ 4.500</td></tr>
+              <tr><td>FC_3307.pdf</td><td>Presencia</td><td>$ 96.800</td><td class="bad">Falta</td></tr></table></div>
+          <div class="msg u rv" data-s="2">Revisá de nuevo solo el comprobante FC A 00012-00003302. Mostrame, lado a lado, los valores…</div></div>
+          <div class="compose"><span class="clip">📎</span><span>Responder…</span><span class="send">↑</span></div></div>` },
+
+    /* ---------- Buenas prácticas ---------- */
+    E.tarjetas({ ch: 4, eyebrow: "Buenas prácticas", titulo: "Para usar Claude bien",
+      narr: [
+        "Cuatro buenas prácticas para cerrar.",
+        "Verificá siempre: Claude puede equivocarse, sobre todo con PDFs escaneados o poco legibles.",
+        "Un chat por subdiario: así no se mezclan clientes ni períodos.",
+        "Sé específico: nombrá el cliente, el período y qué datos comparar. Cuanto más claro el prompt, mejor la respuesta.",
+        "Y cuidá la información: usá solo la cuenta del equipo, nunca una personal.",
+      ],
+      cards: [
+        { ic: "check", t: "Verificá siempre", p: "Cada diferencia se confirma en Onvio o ARCA." },
+        { ic: "doc", t: "Un chat por subdiario", p: "Sin mezclar clientes ni períodos." },
+        { ic: "lista", t: "Sé específico", p: "Cliente, período y datos a comparar." },
+        { ic: "llave", t: "Cuenta del equipo", p: "Nunca una cuenta personal." },
+      ] }),
+
+    E.resumen({ ch: 5, titulo: "Tu control antes de enviar",
+      filas: [
+        ["Ingreso", "claude.ai · <em>Continuar con Google</em> · cuenta del equipo"],
+        ["Ventas", "Excel de Emitidos (ARCA) + Libro IVA Ventas"],
+        ["Compras", "Libro IVA Compras + <em>&nbsp;ZIP con los PDFs</em>"],
+        ["Prompt", "Fechas, puntos de venta, faltantes, importes, rarezas"],
+        ["Después", "<em>Verificá</em> cada diferencia y corregí"],
+      ],
+      narr: [
+        "Repasemos.",
+        "Ingresás a claude.ai con la cuenta de Google del equipo.",
+        "Para ventas, adjuntás el Excel de Emitidos de ARCA y el libro de IVA Ventas.",
+        "Para compras, el libro de IVA Compras y un ZIP con los PDFs.",
+        "El prompt pide revisar fechas, puntos de venta, faltantes, importes y cualquier cosa rara.",
+        "Y cada diferencia la verificás vos antes de corregir y enviar. Ahora, al test.",
+      ] }),
+  ],
+
+  quiz: [
+    { ch: 2, short: "Archivos para ventas",
+      q: "Vas a controlar el subdiario de IVA Ventas. ¿Qué archivos le adjuntás a Claude?",
+      why: "Para ventas se compara el Excel de Comprobantes Emitidos de ARCA con el libro de IVA Ventas de Onvio.",
+      opts: [
+        { t: "El Excel de Emitidos de ARCA y el libro de IVA Ventas de Onvio.", ok: true },
+        { t: "El Excel de Recibidos de ARCA y el libro de IVA Ventas.", why: "Recibidos son las compras." },
+        { t: "Solo el libro de IVA Ventas.", why: "Sin la información de origen no hay contra qué comparar." },
+        { t: "Un ZIP con los PDFs de compras.", why: "Eso corresponde al control de compras." },
+      ] },
+    { ch: 3, short: "Archivos para compras",
+      q: "¿Y para el subdiario de IVA Compras?",
+      why: "Para compras se envía el libro de IVA Compras junto con los comprobantes en PDF comprimidos en un ZIP.",
+      opts: [
+        { t: "El libro de IVA Compras y un ZIP con los PDFs de los comprobantes.", ok: true },
+        { t: "El Excel de Recibidos de ARCA y el libro de IVA Compras.", why: "El control de compras se hace contra los comprobantes reales." },
+        { t: "Los PDFs, sin el libro.", why: "Sin el libro no hay nada que controlar." },
+        { t: "El libro de IVA Ventas.", why: "Ese es el de ventas." },
+      ] },
+    { ch: 1, short: "Qué cuenta usar",
+      q: "Tenés una cuenta personal de Claude en tu casa. ¿Podés usarla para revisar un subdiario?",
+      why: "Hay que usar la cuenta de Google del estudio con acceso al equipo: la información de los clientes no debe salir de ahí.",
+      opts: [
+        { t: "No: solo la cuenta del estudio con acceso al equipo.", ok: true },
+        { t: "Sí, si borro el chat después.", why: "La información ya habría salido de la cuenta del equipo." },
+        { t: "Sí, si es desde la computadora del estudio.", why: "Lo que importa es la cuenta, no la computadora." },
+        { t: "Sí, solo para compras.", why: "Aplica a todos los subdiarios." },
+      ] },
+    { ch: 4, short: "Claude marca una diferencia",
+      scene: "Claude dice que la FC A 0010-00003086 tiene fecha 27/07 en el libro y 26/07 en ARCA.",
+      q: "¿Qué hacés?",
+      why: "Claude es una ayuda: cada diferencia se verifica en el sistema antes de corregir.",
+      opts: [
+        { t: "Lo verifico en ARCA y en Onvio, y corrijo si corresponde.", ok: true },
+        { t: "Corrijo en Onvio sin mirar.", why: "Claude puede equivocarse: hay que verificar." },
+        { t: "Lo ignoro: seguro es un error de Claude.", why: "Puede ser una diferencia real." },
+        { t: "Envío el subdiario y aviso al revisor que Claude encontró algo.", why: "Primero verificás y corregís vos." },
+      ] },
+    { ch: 2, short: "Mejor prompt",
+      q: "¿Cuál de estos prompts es mejor para controlar ventas?",
+      why: "Un buen prompt nombra cliente y período, y dice qué comparar y cómo devolver el resultado.",
+      opts: [
+        { t: "«Compará el Excel de ARCA con el libro de Cliente A, 07/2026: fechas, PV, números, importes y faltantes; devolvé solo las diferencias en una tabla».", ok: true },
+        { t: "«Fijate si está bien».", why: "No dice qué comparar ni cómo responder." },
+        { t: "«Resumime estos archivos».", why: "Un resumen no es un control." },
+        { t: "«Corregí el libro».", why: "Claude no corrige en Onvio: el control y la corrección los hacés vos." },
+      ] },
+    { ch: 4, short: "Chats y clientes",
+      q: "Terminaste de controlar Cliente A y seguís con Cliente B. ¿Qué hacés?",
+      why: "Conviene un chat nuevo por subdiario para no mezclar clientes ni períodos.",
+      opts: [
+        { t: "Abro un chat nuevo para Cliente B.", ok: true },
+        { t: "Sigo en el mismo chat y adjunto los archivos nuevos.", why: "Se pueden mezclar datos de los dos clientes." },
+        { t: "Adjunto los dos clientes juntos para ganar tiempo.", why: "Aumenta el riesgo de confusión." },
+        { t: "Borro el chat anterior y reutilizo el prompt sin cambiarlo.", why: "El prompt tiene que nombrar el cliente y el período correctos." },
+      ] },
+    { ch: 3, short: "Proveedor igual al cliente",
+      q: "¿Por qué el prompt de compras pide verificar que el CUIT del proveedor no sea el de nuestra empresa cliente?",
+      why: "En compras, la empresa cliente es la receptora: su CUIT nunca debe aparecer como proveedor. Si pasa, hay un error de carga.",
+      opts: [
+        { t: "Porque la empresa cliente es la receptora: si figura como proveedor, hay un error.", ok: true },
+        { t: "Porque ARCA lo exige en el prompt.", why: "Es un control interno de calidad." },
+        { t: "Porque así Claude lee más rápido.", why: "No tiene que ver con la velocidad." },
+        { t: "No hace falta verificarlo.", why: "Es un error frecuente y conviene detectarlo." },
+      ] },
+  ],
+};
+
+/* Motor de tutoriales — Estudio Miguel Alonso
+   Espera dos globales: TUT (contenido) e IMG (imágenes {clave:{src,w,h}}). */
+(function () {
+  "use strict";
+  const $ = (s, r = document) => r.querySelector(s);
+  const scenes = TUT.scenes;
+  const WPS = 2.75;          // palabras por segundo sin voz
+  const TAIL = 1.1;          // pausa al terminar cada escena (s)
+
+  /* ---------- helpers de narración ---------- */
+  const txt = (n) => (typeof n === "string" ? n : n.t);
+  const say = (n) => {
+    const s = typeof n === "string" ? n : (n.say || n.t);
+    return s.replace(/\s*>\s*/g, ", ").replace(/«|»|"/g, "");
+  };
+  const sentDur = (n) => Math.max(2.4, txt(n).split(/\s+/).length / WPS + 0.5);
+  const sceneDur = (sc) => sc.narr.reduce((a, n) => a + sentDur(n), 0) + TAIL;
+  const starts = []; let total = 0;
+  scenes.forEach((sc) => { starts.push(total); total += sceneDur(sc); });
+
+  /* ---------- estado ---------- */
+  const S = { i: 0, si: 0, t: 0, tail: 0, phase: "say", playing: false,
+    voice: "speechSynthesis" in window, speed: 1, gen: 0, subs: true, done: false };
+
+  /* ---------- DOM ---------- */
+  const screen = $("#screen"), stage = $("#stage"), subs = $("#subs"), fill = $("#fill"),
+    bar = $("#bar"), timeEl = $("#time"), playBtn = $("#play"), poster = $("#poster"),
+    chName = $("#chname"), chList = $("#chapters");
+
+  function fit() { stage.style.transform = `scale(${screen.clientWidth / 1280})`; }
+  new ResizeObserver(fit).observe(screen); fit();
+
+  /* ---------- capítulos ---------- */
+  const chStart = TUT.chapters.map((_, c) => scenes.findIndex((s) => s.ch === c));
+  const fmt = (s) => { s = Math.max(0, Math.round(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+  chList.innerHTML = TUT.chapters.map((c, k) =>
+    `<li><button type="button" data-ch="${k}"><span>${c}</span><span class="d">${fmt(starts[chStart[k]])}</span></button></li>`).join("") +
+    `<li><button type="button" class="quizb" data-quiz="1"><span>Test final</span></button></li>`;
+  chList.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.quiz) { openQuiz(true); return; }
+    go(chStart[+b.dataset.ch]); if (!S.playing) play();
+  });
+  TUT.chapters.forEach((_, k) => {
+    if (k === 0) return;
+    const tk = document.createElement("span"); tk.className = "tick";
+    tk.style.left = (starts[chStart[k]] / total * 100) + "%"; bar.appendChild(tk);
+  });
+
+  /* ---------- voz ---------- */
+  let voice = null;
+  function pickVoice() {
+    if (!("speechSynthesis" in window)) return;
+    const vs = speechSynthesis.getVoices().filter((v) => /^es/i.test(v.lang));
+    const pref = [/es[-_]AR/i, /es[-_](419|UY|CL|MX|US)/i, /es/i];
+    for (const p of pref) {
+      const cand = vs.filter((v) => p.test(v.lang));
+      if (cand.length) { voice = cand.find((v) => /natural|online|google/i.test(v.name)) || cand[0]; return; }
+    }
+  }
+  if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+  else { $("#voz").hidden = true; }
+  const voiceOn = () => S.voice && "speechSynthesis" in window;
+  function stopVoice() { S.gen++; if ("speechSynthesis" in window) speechSynthesis.cancel(); }
+  function speak() {
+    if (!voiceOn() || !S.playing) return;
+    stopVoice();
+    const g = S.gen;
+    const u = new SpeechSynthesisUtterance(say(scenes[S.i].narr[S.si]));
+    u.lang = voice ? voice.lang : "es-AR"; if (voice) u.voice = voice;
+    u.rate = 1.2 * S.speed;
+    u.onend = () => { if (g === S.gen && S.playing) nextSentence(); };
+    u.onerror = () => { if (g === S.gen && S.playing) nextSentence(); };
+    speechSynthesis.speak(u);
+  }
+
+  /* ---------- render de escena ---------- */
+  let layerInfo = null;
+  // Las cajas se escriben en fracciones de la captura ORIGINAL; se ajustan al recorte.
+  const tb = (im, b) => { if (!b) return b; const c = im.c || [0, 0, 1, 1];
+    return b.length === 2 ? [(b[0] - c[0]) / c[2], (b[1] - c[1]) / c[3]]
+      : [(b[0] - c[0]) / c[2], (b[1] - c[1]) / c[3], b[2] / c[2], b[3] / c[3]]; };
+  function render() {
+    const sc = scenes[S.i];
+    let html = `<div class="sc ${sc.cls || "light"}">${sc.html || ""}`;
+    if (sc.shot) {
+      const sh = sc.shot, [x, y, w, h] = sh.frame, im = IMG[sh.img];
+      html += `<div class="frame" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px">
+        <div class="chrome"><i></i><i></i><i></i><span>${sh.url || "onvio · IVA Ventas/Compras"}</span></div>
+        <div class="viewport"><div class="layer" id="layer">
+          <img src="${im.src}" alt="${sh.alt || ""}">
+          ${(sh.marks || []).map((m) => ({ ...m, box: tb(im, m.box) })).map((m) => `<div class="mark" data-s="${m.s}" data-until="${m.until ?? 99}" style="left:${m.box[0] * 100}%;top:${m.box[1] * 100}%;width:${m.box[2] * 100}%;height:${m.box[3] * 100}%"></div>`).join("")}
+          <div class="cursor" id="cursor"><svg viewBox="0 0 24 24"><path d="M4 2l15 11-7 1 4 8-3 1-4-8-5 5z" fill="#fff" stroke="#0A1F3D" stroke-width="1.4" stroke-linejoin="round"/></svg><span class="rip"></span></div>
+        </div></div>${sh.overlay || ""}</div>`;
+    }
+    html += `<div class="wm">Estudio Miguel Alonso</div><div class="chl">${TUT.chapters[sc.ch]}</div></div>`;
+    stage.innerHTML = html;
+    layerInfo = null;
+    if (sc.shot) {
+      const vp = stage.querySelector(".viewport"), im = IMG[sc.shot.img];
+      const W = sc.shot.frame[2], H = sc.shot.frame[3] - 34;
+      const s0 = Math.min(W / im.w, H / im.h);
+      layerInfo = { W, H, bw: im.w * s0, bh: im.h * s0, el: $("#layer", vp), cur: $("#cursor", vp), lastClick: -1 };
+      layerInfo.el.style.width = layerInfo.bw + "px"; layerInfo.el.style.height = layerInfo.bh + "px";
+    }
+    chName.textContent = TUT.chapters[sc.ch];
+    chList.querySelectorAll("button[data-ch]").forEach((b) => b.setAttribute("aria-current", String(+b.dataset.ch === sc.ch)));
+  }
+
+  function focusBox(box) {
+    const L = layerInfo; if (!L) return;
+    const [x, y, w, h] = box || [0, 0, 1, 1];
+    let s = Math.min((L.W * 0.9) / (w * L.bw), (L.H * 0.86) / (h * L.bh));
+    s = Math.max(1, Math.min(s, box ? 2.4 : 1));
+    const cx = (x + w / 2) * L.bw * s, cy = (y + h / 2) * L.bh * s;
+    const clamp = (v, size, view) => size * s <= view ? (view - size * s) / 2 : Math.min(0, Math.max(view - size * s, v));
+    const tx = clamp(L.W / 2 - cx, L.bw, L.W), ty = clamp(L.H / 2 - cy, L.bh, L.H);
+    L.el.style.transform = `translate(${tx}px,${ty}px) scale(${s})`;
+    L.el.style.setProperty("--inv", (1 / s).toFixed(3));
+  }
+
+  function applySentence() {
+    const sc = scenes[S.i];
+    stage.querySelectorAll("[data-s]").forEach((el) => {
+      const on = S.si >= +el.dataset.s && S.si <= +(el.dataset.until ?? 99);
+      el.classList.toggle("on", on);
+    });
+    stage.querySelectorAll("[data-chg]").forEach((el) => el.classList.toggle("chg", S.si >= +el.dataset.chg));
+    if (sc.shot && layerInfo) {
+      const f = sc.shot.focus || {};
+      let key = -1; Object.keys(f).forEach((k) => { if (+k <= S.si && +k > key) key = +k; });
+      const im = IMG[sc.shot.img];
+      focusBox(key >= 0 ? tb(im, f[key]) : null);
+      const cl = sc.shot.click || {};
+      let ck = -1; Object.keys(cl).forEach((k) => { if (+k <= S.si && +k > ck) ck = +k; });
+      const c = layerInfo.cur;
+      if (ck >= 0) {
+        const pt = tb(im, cl[ck]);
+        c.style.left = pt[0] * 100 + "%"; c.style.top = pt[1] * 100 + "%";
+        if (ck === S.si && layerInfo.lastClick !== ck) { c.classList.remove("click"); void c.offsetWidth; c.classList.add("click"); layerInfo.lastClick = ck; }
+      }
+    }
+    subs.textContent = txt(sc.narr[S.si]);
+  }
+
+  /* ---------- transporte ---------- */
+  function go(i) {
+    if (i >= scenes.length) { finish(); return; }
+    S.i = Math.max(0, i); S.si = 0; S.t = 0; S.tail = 0; S.phase = "say";
+    render(); applySentence(); update();
+    if (S.playing) speak();
+  }
+  function nextSentence() {
+    if (S.si < scenes[S.i].narr.length - 1) { S.si++; S.t = 0; applySentence(); speak(); }
+    else { S.phase = "tail"; S.tail = 0; }
+  }
+  function play() {
+    if (S.done) { S.done = false; go(0); }
+    S.playing = true; poster.hidden = true; S.t = 0; setPlayIcon(); speak();
+  }
+  function pause() { S.playing = false; stopVoice(); setPlayIcon(); }
+  function finish() {
+    pause(); S.done = true; S.i = scenes.length - 1; S.si = scenes[S.i].narr.length - 1; S.phase = "tail"; S.tail = TAIL;
+    update(); openQuiz(false);
+  }
+  function setPlayIcon() {
+    playBtn.innerHTML = S.playing
+      ? `<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg><span>Pausa</span>`
+      : `<svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg><span>${S.done ? "Ver de nuevo" : "Reproducir"}</span>`;
+  }
+  function position() {
+    const sc = scenes[S.i]; let p = starts[S.i];
+    for (let k = 0; k < S.si; k++) p += sentDur(sc.narr[k]);
+    if (S.phase === "tail") p += sentDur(sc.narr[S.si]) + Math.min(S.tail, TAIL);
+    else p += Math.min(S.t, sentDur(sc.narr[S.si]));
+    return p;
+  }
+  function update() {
+    const p = position();
+    fill.style.width = (p / total * 100) + "%";
+    timeEl.textContent = `${fmt(p)} / ${fmt(total)}`;
+    bar.setAttribute("aria-valuenow", Math.round(p / total * 100));
+  }
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    if (S.playing) {
+      const d = dt * S.speed;
+      if (S.phase === "say") {
+        S.t += d;
+        const est = sentDur(scenes[S.i].narr[S.si]);
+        if (!voiceOn() && S.t >= est) nextSentence();
+        else if (voiceOn() && S.t > est * 2.5 + 6) nextSentence(); // por si la voz no responde
+      } else {
+        S.tail += d;
+        if (S.tail >= TAIL) go(S.i + 1);
+      }
+      update();
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  /* ---------- controles ---------- */
+  playBtn.onclick = () => (S.playing ? pause() : play());
+  poster.onclick = play;
+  screen.addEventListener("click", (e) => { if (e.target === screen || stage.contains(e.target)) S.playing ? pause() : play(); });
+  $("#prev").onclick = () => { S.done = false; go(S.si > 0 || S.t > 2 ? S.i : S.i - 1); };
+  $("#next").onclick = () => { S.done = false; go(S.i + 1); };
+  bar.addEventListener("click", (e) => {
+    const r = bar.getBoundingClientRect(), p = (e.clientX - r.left) / r.width * total;
+    let k = 0; while (k < scenes.length - 1 && starts[k + 1] <= p) k++;
+    S.done = false; go(k); if (!S.playing) play();
+  });
+  const vozBtn = $("#voz");
+  vozBtn.onclick = () => {
+    S.voice = !S.voice; vozBtn.setAttribute("aria-pressed", String(S.voice));
+    if (S.voice) { S.t = 0; speak(); } else stopVoice();
+  };
+  vozBtn.setAttribute("aria-pressed", String(voiceOn()));
+  const subBtn = $("#cc");
+  subBtn.onclick = () => { S.subs = !S.subs; subBtn.setAttribute("aria-pressed", String(S.subs)); subs.dataset.off = S.subs ? "0" : "1"; };
+  const velBtn = $("#vel"), speeds = [1, 1.25, 1.5, 0.85];
+  velBtn.onclick = () => {
+    S.speed = speeds[(speeds.indexOf(S.speed) + 1) % speeds.length];
+    velBtn.textContent = S.speed.toString().replace(".", ",") + "×";
+    if (S.playing && voiceOn()) { S.t = 0; speak(); }
+  };
+  $("#fs").onclick = () => {
+    const p = $("#player");
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (p.requestFullscreen) p.requestFullscreen().catch(() => {});
+  };
+  document.addEventListener("fullscreenchange", fit);
+  document.addEventListener("keydown", (e) => {
+    if (e.target.closest("input,textarea,select")) return;
+    if (e.target.closest(".quiz")) return;
+    if (e.code === "Space" || e.key === "k") { e.preventDefault(); S.playing ? pause() : play(); }
+    else if (e.key === "ArrowRight") { S.done = false; go(S.i + 1); }
+    else if (e.key === "ArrowLeft") { S.done = false; go(S.i - 1); }
+  });
+  window.addEventListener("beforeunload", stopVoice);
+
+  /* =================================================================
+     QUIZ
+     ================================================================= */
+  const qRoot = $("#quiz");
+  const Q = { order: [], k: 0, answers: [] };
+  const LET = "ABCD";
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+  function quizIntro() {
+    qRoot.innerHTML = `<div class="qcard"><div class="qhead"><h2>Test final</h2><span class="tag">${TUT.quiz.length} preguntas</span></div>
+      <p class="qtext" style="font-weight:400">Situaciones reales del estudio: pensá qué harías en cada caso. Después de cada respuesta vas a ver por qué es correcta o no.</p>
+      <p class="help">Para aprobar necesitás ${Math.ceil(TUT.quiz.length * 0.7)} respuestas correctas o más.</p>
+      <div class="qact"><button class="btn or" type="button" id="qstart">Empezar el test</button></div></div>`;
+    $("#qstart").onclick = startQuiz;
+  }
+  function startQuiz() {
+    Q.order = shuffle(TUT.quiz.map((_, i) => i)); Q.k = 0; Q.answers = [];
+    showQ();
+  }
+  function prog() {
+    return `<div class="qprog" aria-hidden="true">${Q.order.map((_, i) =>
+      `<i class="${i < Q.answers.length ? (Q.answers[i].ok ? "ok" : "bad") : i === Q.k ? "cur" : ""}"></i>`).join("")}</div>`;
+  }
+  function showQ() {
+    const q = TUT.quiz[Q.order[Q.k]];
+    const opts = shuffle(q.opts.map((o, i) => ({ ...o, i })));
+    qRoot.innerHTML = `<div class="qcard"><div class="qhead"><span class="qnum">Pregunta ${Q.k + 1} de ${Q.order.length}</span>${prog()}</div>
+      ${q.scene ? `<p class="qscene">${q.scene}</p>` : ""}
+      <p class="qtext" id="qt">${q.q}</p>
+      <div class="opts" role="group" aria-labelledby="qt">${opts.map((o, j) =>
+        `<button type="button" class="opt" id="opt-${j}" data-i="${o.i}"><b>${LET[j]}</b><span>${o.t}</span></button>`).join("")}</div>
+      <div id="fb"></div><div class="qact" id="qact"></div></div>`;
+    qRoot.querySelectorAll(".opt").forEach((b) => (b.onclick = () => answer(q, +b.dataset.i)));
+    const first = qRoot.querySelector(".opt"); if (first) first.focus({ preventScroll: true });
+  }
+  function answer(q, i) {
+    const ok = !!q.opts[i].ok;
+    Q.answers.push({ q: Q.order[Q.k], ok });
+    qRoot.querySelectorAll(".opt").forEach((b) => {
+      b.disabled = true; const bi = +b.dataset.i;
+      if (q.opts[bi].ok) b.classList.add("ok");
+      else if (bi === i) b.classList.add("bad");
+      else b.classList.add("dim");
+    });
+    const why = q.opts[i].why || q.why;
+    $("#fb").innerHTML = `<div class="fb ${ok ? "ok" : "bad"}" role="status"><strong>${ok ? "¡Correcto!" : "No es correcto."}</strong>${ok ? q.why : (why + (why !== q.why ? " " + q.why : ""))}</div>`;
+    const lastQ = Q.k === Q.order.length - 1;
+    $("#qact").innerHTML = `<button type="button" class="btn" id="qnext">${lastQ ? "Ver resultado" : "Siguiente pregunta"}</button>` +
+      (!ok && q.ch != null ? `<button type="button" class="btn alt" id="qrev">Repasar: ${TUT.chapters[q.ch]}</button>` : "");
+    qRoot.querySelector(".qprog").outerHTML = prog();
+    $("#qnext").onclick = () => { if (lastQ) result(); else { Q.k++; showQ(); } };
+    const rv = $("#qrev"); if (rv) rv.onclick = () => review(q.ch);
+    $("#qnext").focus({ preventScroll: true });
+  }
+  function review(ch) {
+    S.done = false; go(chStart[ch]); play();
+    $("#player").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  function result() {
+    const n = Q.answers.filter((a) => a.ok).length, tot = Q.answers.length, pct = Math.round(n / tot * 100);
+    const pass = n >= Math.ceil(tot * 0.7);
+    try { localStorage.setItem("ema-quiz-" + TUT.id, JSON.stringify({ n, tot, at: Date.now() })); } catch (e) { /* sin almacenamiento */ }
+    qRoot.innerHTML = `<div class="qcard"><div class="qhead"><h2>${pass ? "¡Aprobado!" : "Casi… repasemos"}</h2>${prog()}</div>
+      <div class="score"><div class="ring" style="--p:${pct};--c:${pass ? "var(--ok)" : "var(--orange)"}"><span>${n}/${tot}</span></div>
+      <p style="margin:0;max-width:48ch;font-size:17px">${pass
+        ? "Entendiste cómo se trabaja en cada caso. Si alguna respuesta falló, repasá ese capítulo antes de hacerlo en el sistema."
+        : "Te conviene volver a ver los capítulos marcados y hacer el test de nuevo."}</p></div>
+      <ul class="review">${Q.answers.map((a) => { const q = TUT.quiz[a.q];
+        return `<li class="${a.ok ? "ok" : "bad"}"><i>${a.ok ? "✓" : "✗"}</i><span>${q.short || q.q}</span>${!a.ok && q.ch != null ? `<button type="button" data-ch="${q.ch}">Repasar</button>` : ""}</li>`; }).join("")}</ul>
+      <div class="qact"><button type="button" class="btn or" id="qagain">Hacer el test de nuevo</button><button type="button" class="btn alt" id="qvid">Volver a ver el video</button></div></div>`;
+    qRoot.querySelectorAll(".review button").forEach((b) => (b.onclick = () => review(+b.dataset.ch)));
+    $("#qagain").onclick = startQuiz;
+    $("#qvid").onclick = () => { S.done = false; go(0); play(); $("#player").scrollIntoView({ behavior: "smooth" }); };
+  }
+  function openQuiz(user) {
+    if (!qRoot.querySelector(".qcard")) quizIntro();
+    if (user && S.playing) pause();
+    qRoot.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  quizIntro();
+
+  /* ---------- recursos para copiar ---------- */
+  if (TUT.recursos && TUT.recursos.length) {
+    $("#recursos").hidden = false;
+    const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    $("#reclist").innerHTML = TUT.recursos.map((r, i) =>
+      `<details class="rec"${i ? "" : " open"}><summary>${r.t}</summary><pre id="rec-${i}">${esc(r.texto)}</pre>
+       <button type="button" class="copy" data-i="${i}">Copiar</button></details>`).join("");
+    $("#reclist").addEventListener("click", async (e) => {
+      const b = e.target.closest(".copy"); if (!b) return;
+      const pre = $("#rec-" + b.dataset.i);
+      let ok = false;
+      try { await navigator.clipboard.writeText(TUT.recursos[+b.dataset.i].texto); ok = true; } catch (err) { /* sin portapapeles */ }
+      if (!ok) { const r = document.createRange(); r.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+      b.textContent = ok ? "¡Copiado!" : "Texto seleccionado: Ctrl+C";
+      setTimeout(() => (b.textContent = "Copiar"), 2200);
+    });
+  }
+
+  /* ---------- inicio ---------- */
+  // Enlace directo: #escena=7 (y opcionalmente &frase=2)
+  const hp = new URLSearchParams(location.hash.slice(1));
+  if (hp.get("modo") === "captura") { document.body.classList.add("cap"); poster.hidden = true; fit(); }
+  go(Math.min(scenes.length - 1, Math.max(0, (+hp.get("escena") || 1) - 1)));
+  if (hp.get("frase")) { S.si = Math.min(+hp.get("frase") - 1, scenes[S.i].narr.length - 1); applySentence(); update(); }
+  setPlayIcon();
+})();
+
+</script>
+
+</body>
+</html>

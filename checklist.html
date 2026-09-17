@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Checklist del primer mes</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230F2F5C'/><path d='M16 33l10 10 22-22' stroke='%23F26A1B' stroke-width='8' fill='none' stroke-linecap='round'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=JetBrains+Mono:wght@500&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+:root{
+  --navy:#0F2F5C; --navy-2:#1A4580; --orange:#F26A1B; --orange-2:#FF8A3D; --orange-soft:#FFE8D9;
+  --white:#FFFFFF; --paper:#F2F5F9; --line:#D5DEE9; --ink:#0E1A2B; --muted:#56667D; --ok:#1D8A57; --ok-soft:#E1F4EA;
+  --f-display:"Archivo","Arial Narrow","Segoe UI",sans-serif; --f-body:"Source Sans 3","Segoe UI",Roboto,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,monospace; color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{background:var(--paper)}
+body{margin:0;font-family:var(--f-body);color:var(--ink);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:0 56px}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.wrap{max-width:860px;margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:18px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:700;color:var(--navy)}
+.brand .mk{width:34px;height:34px;border-radius:8px;background:var(--navy);color:var(--white);display:grid;place-items:center;font-size:13px;letter-spacing:.08em}
+.back{font-size:14px;font-weight:700;color:var(--navy);text-decoration:none;border:1px solid var(--line);background:var(--white);padding:5px 12px;border-radius:99px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--orange)}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(32px,5vw,46px);line-height:1.05;margin:6px 0 8px;color:var(--navy)}
+.lead{margin:0 0 18px;color:var(--muted);max-width:62ch}
+.sticky{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding-block:10px}
+.meter{display:flex;align-items:center;gap:12px;background:var(--white);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.meter .bar{flex:1;height:10px;background:var(--paper);border-radius:6px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:var(--orange);transition:width .4s}
+.meter b{font-family:var(--f-display);color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}
+section{margin-top:26px}
+section h2{font-family:var(--f-display);font-size:22px;color:var(--navy);margin:0 0 4px}
+section > p{margin:0 0 10px;color:var(--muted);font-size:14px}
+ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+label.item{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:start;background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color .15s,background .15s}
+label.item:hover{border-color:var(--navy-2)}
+label.item input{appearance:none;width:24px;height:24px;border:2px solid var(--line);border-radius:7px;margin:1px 0 0;display:grid;place-items:center;cursor:pointer;background:var(--white)}
+label.item input:checked{background:var(--ok);border-color:var(--ok)}
+label.item input:checked::after{content:"";width:6px;height:12px;border:solid var(--white);border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+label.item strong{display:block;font-size:17px;color:var(--ink)}
+label.item span{display:block;color:var(--muted);font-size:14px}
+label.item:has(input:checked){background:var(--ok-soft);border-color:#B7E0C9}
+label.item:has(input:checked) strong{text-decoration:line-through;text-decoration-color:rgba(14,26,43,.35)}
+label.item a{color:var(--navy);font-weight:700}
+.tip{margin-top:30px;background:var(--navy);color:var(--white);border-radius:14px;padding:18px 20px}
+.tip b{color:var(--orange-2)}
+.foot{margin-top:30px;border-top:1px solid var(--line);padding-top:14px;font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="mk">EMA</span>Estudio Miguel Alonso</div>
+    <a class="back" href="index.html">← Onboarding Contabilidad</a>
+  </header>
+
+  <div class="eyebrow">Etapa 1 · Tu primera semana</div>
+  <h1>Checklist del primer mes</h1>
+  <p class="lead">Marcá cada punto a medida que lo tengas listo. Si algo no está, pedíselo a tu líder: es normal que algunos accesos tarden unos días.</p>
+
+  <div class="sticky"><div class="meter"><div class="bar"><i id="bar"></i></div><b id="count">0 de 12</b></div></div>
+
+  <section>
+    <h2>Accesos</h2>
+    <p>Las herramientas que vas a necesitar desde el primer día.</p>
+    <ul>
+      <li><label class="item"><input type="checkbox" id="c-mail" data-k="mail"><div><strong>Cuenta de correo del estudio</strong><span>Es la que usás para la intranet y para Claude.</span></div></label></li>
+      <li><label class="item"><input type="checkbox" id="c-intranet" data-k="intranet"><div><strong>Acceso a la intranet</strong><span>Revisá que veas la portada, el Organigrama y tu Espacio del colaborador.</span></div></label></li>
+      <li><label class="item"><input type="checkbox" id="c-onvio" data-k="onvio"><div><strong>Usuario de Onvio</strong><span>Con acceso al módulo IVA Ventas/Compras y a las empresas de tu equipo.</span></div></label></li>
+      <li><label class="item"><input type="checkbox" id="c-claves" data-k="claves"><div><strong>Archivo de claves de tu equipo</strong><span>Para ingresar a ARCA con la Clave Fiscal de cada cliente. Es confidencial.</span></div></label></li>
+      <li><label class="item"><input type="checkbox" id="c-claude" data-k="claude"><div><strong>Acceso a Claude con la cuenta del equipo</strong><span>Entrá a claude.ai con «Continuar con Google» y la cuenta del estudio.</span></div></label></li>
+      <li><label class="item"><input type="checkbox" id="c-importador" data-k="importador"><div><strong>Importador del estudio instalado</strong><span>Que abra en <code>localhost:8080</code> y tenga cargada la API key del estudio.</span></div></label></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Tu equipo</h2>
+    <p>Saber a quién recurrir te ahorra tiempo.</p>
+    <ul>
+      <li><label class="item"><input type="checkbox" id="c-lider" data-k="lider"><div><strong>Sé quién es mi líder</strong><span>Es quien informa la asignación de subdiarios a fin de mes.</span></div></label></li>
+      <li><label class="item"><input type="checkbox" id="c-clientes" data-k="clientes"><div><strong>Conozco los clientes de mi equipo</strong><span>Y sus particularidades: regímenes, plantillas, moneda extranjera.</span></div></label></li>
+      <li><label class="item"><input type="checkbox" id="c-asignacion" data-k="asignacion"><div><strong>Recibí mi primera asignación</strong><span>Cliente, libro, vencimiento y compañero que revisa.</span></div></label></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Formación</h2>
+    <p>Lo mínimo antes de tu primer subdiario.</p>
+    <ul>
+      <li><label class="item"><input type="checkbox" id="c-herr" data-k="herr"><div><strong>Aprobé los tutoriales de herramientas</strong><span><a href="tutoriales/arca.html">ARCA</a>, <a href="tutoriales/onvio-iva.html">Onvio</a> y <a href="tutoriales/importador-del-estudio.html">el Importador</a>.</span></div></label></li>
+      <li><label class="item"><input type="checkbox" id="c-proceso" data-k="proceso"><div><strong>Entendí el proceso de subdiarios</strong><span><a href="tutoriales/subdiarios.html">El proceso de subdiarios</a> y <a href="tutoriales/revision-con-claude.html">la revisión con Claude</a>.</span></div></label></li>
+      <li><label class="item"><input type="checkbox" id="c-primero" data-k="primero"><div><strong>Envié mi primer subdiario revisado</strong><span>Con el autocontrol hecho y antes del vencimiento.</span></div></label></li>
+    </ul>
+  </section>
+
+  <div class="tip"><b>Consejo:</b> anotá tus dudas a medida que aparecen y consultalas juntas con tu líder. Ninguna pregunta está de más en el primer mes.</div>
+  <p class="foot">Las marcas se guardan solo en este navegador.</p>
+</div>
+<script>
+const KEY = "ema-checklist";
+let st = {};
+try { st = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+const boxes = [...document.querySelectorAll("input[data-k]")];
+function upd() {
+  const n = boxes.filter((b) => b.checked).length;
+  document.getElementById("count").textContent = `${n} de ${boxes.length}`;
+  document.getElementById("bar").style.width = (n / boxes.length * 100) + "%";
+}
+boxes.forEach((b) => {
+  b.checked = !!st[b.dataset.k];
+  b.addEventListener("change", () => {
+    st[b.dataset.k] = b.checked;
+    try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {}
+    upd();
+  });
+});
+upd();
+</script>
+</body>
+</html>

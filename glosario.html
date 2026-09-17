@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Glosario contable-impositivo</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230F2F5C'/><text x='32' y='44' font-size='34' text-anchor='middle' fill='%23F26A1B' font-family='Arial' font-weight='700'>Aa</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=JetBrains+Mono:wght@500&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+:root{
+  --navy:#0F2F5C; --navy-2:#1A4580; --navy-ink:#0A1F3D; --orange:#F26A1B; --orange-2:#FF8A3D; --orange-soft:#FFE8D9;
+  --white:#FFFFFF; --paper:#F2F5F9; --line:#D5DEE9; --ink:#0E1A2B; --muted:#56667D; --ok:#1D8A57; --ok-soft:#E1F4EA; --bad:#C23A2E; --bad-soft:#FBE6E3;
+  --f-display:"Archivo","Arial Narrow","Segoe UI",sans-serif; --f-body:"Source Sans 3","Segoe UI",Roboto,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,monospace; color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--paper)}
+body{margin:0;font-family:var(--f-body);color:var(--ink);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:0 56px}
+button,input{font:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.wrap{max-width:1000px;margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:18px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:700;color:var(--navy)}
+.brand .mk{width:34px;height:34px;border-radius:8px;background:var(--navy);color:var(--white);display:grid;place-items:center;font-size:13px;letter-spacing:.08em}
+.back{font-size:14px;font-weight:700;color:var(--navy);text-decoration:none;border:1px solid var(--line);background:var(--white);padding:5px 12px;border-radius:99px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--orange)}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(32px,5vw,46px);line-height:1.05;margin:6px 0 8px;color:var(--navy)}
+.lead{margin:0 0 18px;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:6px;background:var(--white);border:1px solid var(--line);border-radius:12px;padding:4px;width:max-content;max-width:100%}
+.tabs button{border:0;background:transparent;border-radius:9px;padding:8px 16px;font-weight:700;color:var(--muted);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--navy);color:var(--white)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.tools input{flex:1;min-width:220px;border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--white)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{border:1px solid var(--line);background:var(--white);border-radius:99px;padding:6px 12px;font-size:14px;cursor:pointer;color:var(--ink)}
+.chips button[aria-pressed="true"]{background:var(--orange);border-color:var(--orange);color:var(--white)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.term{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:16px}
+.term h3{margin:0;font-family:var(--f-display);font-size:20px;color:var(--navy);display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.term h3 small{font-family:var(--f-body);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--orange)}
+.term .full{margin:2px 0 6px;font-size:14px;color:var(--muted);font-style:italic}
+.term p{margin:0;font-size:15px}
+.term .ej{margin-top:8px;font-size:14px;background:var(--paper);border-radius:8px;padding:6px 10px}
+.empty{color:var(--muted);padding:20px 0}
+/* práctica */
+.card{max-width:640px;background:var(--white);border:1px solid var(--line);border-radius:16px;padding:clamp(18px,4vw,30px);margin-top:16px}
+.card .q{font-family:var(--f-display);font-size:clamp(20px,3vw,26px);line-height:1.2;color:var(--navy);margin:6px 0 16px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;border:2px solid var(--line);background:var(--white);border-radius:10px;padding:12px 14px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--navy-2)}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.score{font-family:var(--f-mono);font-size:14px;color:var(--muted)}
+.btn{border:0;border-radius:10px;padding:10px 18px;font-weight:700;background:var(--navy);color:var(--white);cursor:pointer;margin-top:14px}
+.fb{margin-top:12px;font-size:15px;border-radius:10px;padding:10px 12px}
+.fb.ok{background:var(--ok-soft);color:#0F5534}.fb.bad{background:var(--bad-soft);color:#7E2018}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="mk">EMA</span>Estudio Miguel Alonso</div>
+    <a class="back" href="index.html">← Onboarding Contabilidad</a>
+  </header>
+  <div class="eyebrow">Etapa 1 · Tu primera semana</div>
+  <h1>Glosario contable-impositivo</h1>
+  <p class="lead">Las palabras que vas a escuchar todos los días. Buscalas cuando las necesites, o practicá con preguntas.</p>
+
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" id="t-lista" aria-selected="true">Glosario</button>
+    <button type="button" role="tab" id="t-prac" aria-selected="false">Practicar</button>
+  </div>
+
+  <div id="p-lista">
+    <div class="tools">
+      <input type="search" id="buscar" placeholder="Buscar un término… (ej.: percepción)" aria-label="Buscar un término">
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div id="p-prac" hidden>
+    <div class="card" id="card"></div>
+  </div>
+</div>
+<script>
+const G = [
+  { t: "ARCA", f: "Agencia de Recaudación y Control Aduanero", c: "Organismos", d: "El organismo nacional de recaudación, que reemplazó a la AFIP. Allí se consultan y emiten los comprobantes electrónicos." },
+  { t: "AFIP", f: "Administración Federal de Ingresos Públicos", c: "Organismos", d: "Nombre anterior de ARCA. Todavía aparece en algunas pantallas y plantillas, como «AFIP - Mis Comprobantes»." },
+  { t: "CUIT", f: "Clave Única de Identificación Tributaria", c: "Identificación", d: "Número de 11 dígitos que identifica a una empresa o persona ante el fisco.", e: "En el Importador se carga sin guiones ni puntos." },
+  { t: "CUIL", f: "Código Único de Identificación Laboral", c: "Identificación", d: "Identificación de las personas trabajadoras. Tiene el mismo formato que la CUIT." },
+  { t: "Clave Fiscal", c: "Identificación", d: "La contraseña para operar en ARCA. En el estudio se trabaja con el archivo de claves de cada equipo." },
+  { t: "RI", f: "Responsable Inscripto", c: "Condición frente al IVA", d: "Contribuyente inscripto en IVA: discrimina el impuesto en sus facturas A y puede computar el IVA de sus compras." },
+  { t: "Monotributista", f: "MT · Régimen Simplificado", c: "Condición frente al IVA", d: "Pequeño contribuyente que paga una cuota fija; emite facturas C y no discrimina IVA." },
+  { t: "CF", f: "Consumidor Final", c: "Condición frente al IVA", d: "Quien compra para consumo propio. Recibe facturas B." },
+  { t: "Exento", f: "EX", c: "Condición frente al IVA", d: "Sujeto u operación que no paga IVA por disposición de la ley." },
+  { t: "Factura A", c: "Comprobantes", d: "La emite un Responsable Inscripto a otro Responsable Inscripto. Discrimina el IVA." },
+  { t: "Factura B", c: "Comprobantes", d: "La emite un Responsable Inscripto a consumidores finales, exentos o monotributistas. El IVA está incluido en el precio." },
+  { t: "Factura C", c: "Comprobantes", d: "La emiten monotributistas y exentos. No discrimina IVA." },
+  { t: "Factura E", c: "Comprobantes", d: "Comprobante de exportación. Al importar compras, las E se graban con IVA 0 %." },
+  { t: "Nota de crédito", f: "NC", c: "Comprobantes", d: "Anula total o parcialmente una factura. Sus importes restan en el libro.", e: "Con factura electrónica, una factura emitida se corrige con NC, no se anula." },
+  { t: "Nota de débito", f: "ND", c: "Comprobantes", d: "Agrega un importe a una factura ya emitida (por ejemplo, intereses o diferencias de precio)." },
+  { t: "Punto de venta", f: "PV", c: "Comprobantes", d: "Los primeros dígitos del número de comprobante: identifican desde dónde se emitió.", e: "En FC A 0010-00003086, el punto de venta es 0010." },
+  { t: "CAE", f: "Código de Autorización Electrónico", c: "Comprobantes", d: "Código que otorga ARCA a cada comprobante electrónico y que lo valida." },
+  { t: "IVA", f: "Impuesto al Valor Agregado", c: "Impuestos", d: "Impuesto nacional sobre el consumo que se agrega al precio de bienes y servicios." },
+  { t: "Alícuota", c: "Impuestos", d: "El porcentaje de un impuesto. En IVA, las más comunes son 21 %, 10,5 % y 27 %.", e: "Neto 1.000 × 21 % = IVA 210." },
+  { t: "Neto gravado", c: "Impuestos", d: "El importe sobre el que se calcula el IVA." },
+  { t: "No gravado", c: "Impuestos", d: "Importe que no está alcanzado por el IVA (no forma parte de su base)." },
+  { t: "Exento (importe)", c: "Impuestos", d: "Importe que estaría alcanzado por el IVA, pero una norma lo libera del pago." },
+  { t: "IIBB", f: "Impuesto sobre los Ingresos Brutos", c: "Impuestos", d: "Impuesto provincial sobre la facturación. Cada jurisdicción tiene sus regímenes: CABA y Provincia de Buenos Aires son distintas." },
+  { t: "Percepción", c: "Regímenes", d: "Un impuesto que el vendedor cobra además del precio, en la misma factura, a cuenta del impuesto del comprador.", e: "Factura con «Perc. IIBB CABA $ 4.500»." },
+  { t: "Retención", c: "Regímenes", d: "Un importe que quien paga descuenta del pago y deposita al fisco, a cuenta del impuesto de quien cobra.", e: "Retención de IIBB del 3 % sobre $ 200.000 = $ 6.000." },
+  { t: "Régimen especial", c: "Regímenes", d: "En Onvio, cada régimen de percepción o retención con su código. Los regímenes 1 a 4 de la importación deben seguir el orden del Importador del estudio." },
+  { t: "CIRAVI", c: "Regímenes", d: "Régimen del sector cinematográfico (Decreto 1008/2001). Los clientes que lo tienen usan la plantilla Distribuidoras Cines." },
+  { t: "DDJJ", f: "Declaración jurada", c: "Libros y declaraciones", d: "Presentación periódica de un impuesto ante el fisco. Cada comprobante tiene un período de DDJJ en Onvio." },
+  { t: "Período fiscal", c: "Libros y declaraciones", d: "El mes (o año) al que corresponde una declaración. Se escribe MM/AAAA.", e: "07/2026" },
+  { t: "Libro IVA Ventas", c: "Libros y declaraciones", d: "Registro mensual de todas las ventas de una empresa, con sus importes e impuestos." },
+  { t: "Libro IVA Compras", c: "Libros y declaraciones", d: "Registro mensual de todas las compras de una empresa, con sus importes, IVA y percepciones." },
+  { t: "Subdiario", c: "Libros y declaraciones", d: "En el estudio, el libro de IVA Ventas o Compras de un cliente para un mes: se carga, se controla y lo revisa un compañero." },
+  { t: "Mis Comprobantes", c: "Sistemas", d: "Servicio de ARCA para consultar y descargar en Excel los comprobantes emitidos y recibidos." },
+  { t: "Comprobantes en línea", f: "RCEL", c: "Sistemas", d: "Servicio de ARCA para emitir comprobantes electrónicos y consultar o descargar su PDF." },
+  { t: "Onvio", c: "Sistemas", d: "El sistema contable del estudio (Thomson Reuters). Usamos el módulo IVA Ventas/Compras." },
+  { t: "PRE005", c: "Sistemas", d: "Configuración predefinida de Onvio para importar el Excel de «AFIP - Mis Comprobantes»." },
+  { t: "Concepto", c: "Sistemas", d: "En Onvio, el código que clasifica cada línea de un comprobante (por ejemplo, VENTAS o MERC21)." },
+  { t: "Importador del estudio", c: "Sistemas", d: "Aplicación interna que lee los PDFs de comprobantes con IA y arma el Excel para importar en Onvio." },
+  { t: "Data entry", c: "Trabajo diario", d: "La carga de datos: registrar comprobantes en el sistema, a mano o por importación." },
+  { t: "Tipo de cambio", c: "Trabajo diario", d: "El valor de una moneda extranjera en pesos. En facturas en dólares se usa el que declara la factura." },
+];
+const cats = ["Todos", ...new Set(G.map((g) => g.c))];
+let cat = "Todos";
+const grid = document.getElementById("grid"), q = document.getElementById("buscar");
+const norm = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+document.getElementById("chips").innerHTML = cats.map((c) => `<button type="button" aria-pressed="${c === cat}" data-c="${c}">${c}</button>`).join("");
+document.getElementById("chips").onclick = (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  cat = b.dataset.c;
+  document.querySelectorAll("#chips button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.c === cat)));
+  pintar();
+};
+function pintar() {
+  const t = norm(q.value.trim());
+  const l = G.filter((g) => (cat === "Todos" || g.c === cat) && (!t || norm(g.t + " " + (g.f || "") + " " + g.d).includes(t)))
+    .sort((a, b) => a.t.localeCompare(b.t, "es"));
+  grid.innerHTML = l.length ? l.map((g) => `<article class="term"><h3>${g.t}<small>${g.c}</small></h3>${g.f ? `<div class="full">${g.f}</div>` : ""}<p>${g.d}</p>${g.e ? `<div class="ej">${g.e}</div>` : ""}</article>`).join("")
+    : `<p class="empty">No encontramos «${q.value}». Probá con otra palabra.</p>`;
+}
+q.oninput = pintar; pintar();
+
+/* pestañas */
+const tabs = { lista: document.getElementById("t-lista"), prac: document.getElementById("t-prac") };
+function tab(k) {
+  Object.entries(tabs).forEach(([n, b]) => b.setAttribute("aria-selected", String(n === k)));
+  document.getElementById("p-lista").hidden = k !== "lista";
+  document.getElementById("p-prac").hidden = k !== "prac";
+  if (k === "prac" && !P.q) nueva();
+}
+tabs.lista.onclick = () => tab("lista"); tabs.prac.onclick = () => tab("prac");
+
+/* práctica: definición → elegir término */
+const P = { q: null, ok: 0, n: 0 };
+const pick = (a, k) => a.slice().sort(() => Math.random() - 0.5).slice(0, k);
+function nueva() {
+  const r = pick(G, 1)[0];
+  const otros = pick(G.filter((g) => g !== r && g.c === r.c), 3);
+  const extra = pick(G.filter((g) => g !== r && !otros.includes(g)), 3 - otros.length);
+  P.q = r;
+  const ops = pick([r, ...otros, ...extra], 4);
+  document.getElementById("card").innerHTML = `<div class="row"><span class="eyebrow">¿Qué término es?</span><span class="score">${P.ok} / ${P.n} correctas</span></div>
+    <p class="q">${r.d}</p>
+    <div class="opts">${ops.map((o, i) => `<button type="button" class="opt" id="op-${i}" data-t="${o.t}">${o.t}</button>`).join("")}</div>
+    <div id="fbk"></div>`;
+  document.querySelectorAll(".opt").forEach((b) => (b.onclick = () => resp(b)));
+}
+function resp(b) {
+  const ok = b.dataset.t === P.q.t; P.n++; if (ok) P.ok++;
+  document.querySelectorAll(".opt").forEach((x) => { x.disabled = true; if (x.dataset.t === P.q.t) x.classList.add("ok"); else if (x === b) x.classList.add("bad"); });
+  document.getElementById("fbk").innerHTML = `<div class="fb ${ok ? "ok" : "bad"}">${ok ? "¡Correcto!" : `Era <b>${P.q.t}</b>.`}${P.q.e ? " Ejemplo: " + P.q.e : ""}</div><button type="button" class="btn" id="sig">Otra pregunta</button>`;
+  document.querySelector(".score").textContent = `${P.ok} / ${P.n} correctas`;
+  document.getElementById("sig").onclick = nueva;
+  document.getElementById("sig").focus();
+  if (P.n >= 5) { try { localStorage.setItem("ema-glosario", JSON.stringify({ ok: P.ok, n: P.n, at: Date.now() })); } catch (e) {} }
+}
+</script>
+</body>
+</html>
