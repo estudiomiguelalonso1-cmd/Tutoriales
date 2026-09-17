@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Revisión de subdiarios con Claude</title>
+<title>El sistema de gestión</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=JetBrains+Mono:wght@500&family=Source+Sans+3:wght@400;600;700&display=swap">
@@ -406,12 +406,12 @@ body.cap *{animation:none!important;transition:none!important}
 
 <header class="top">
   <div class="brand"><span class="mk">EMA</span><div>Estudio Miguel Alonso<small>Tutoriales internos</small></div></div>
-  <div class="top-r"><a class="back" href="../index.html">← Onboarding Contabilidad</a><span class="tag">Claude · Control de calidad</span></div>
+  <div class="top-r"><a class="back" href="../index.html">← Onboarding Contabilidad</a><span class="tag">Sistema de Gestión · Integrante</span></div>
 </header>
 
 <section class="head">
-  <h1>Revisión de subdiarios con Claude</h1>
-  <p>Cómo ingresar a Claude con la cuenta del equipo y usarlo para comparar el libro de IVA Ventas contra ARCA, y el de IVA Compras contra los PDFs. Con prompts listos para copiar.</p>
+  <h1>El sistema de gestión</h1>
+  <p>Cómo se organiza el sistema, tu dashboard, tus tableros, el cronómetro, el semáforo de vencimientos y cómo pedir acceso o ayuda.</p>
 </section>
 
 <div class="layout">
@@ -454,7 +454,7 @@ body.cap *{animation:none!important;transition:none!important}
 
 <section class="quiz" id="quiz" aria-label="Test final"></section>
 
-<footer class="foot"><span>© Estudio Miguel Alonso · Material de capacitación interna</span><span>Proceso interno de Contabilidad</span></footer>
+<footer class="foot"><span>© Estudio Miguel Alonso · Material de capacitación interna</span><span>Basado en el Manual del Sistema del estudio</span></footer>
 
 <script>
 const IMG = {};
@@ -573,290 +573,363 @@ const E = (() => {
   return { titulo, texto, tarjetas, ruta, alerta, captura, lista, resumen, ICONOS, pad };
 })();
 
-/* Tutorial: Revisión de subdiarios con Claude */
-const PROMPT_VENTAS = `Sos un asistente contable. Te adjunto dos archivos de la empresa [NOMBRE DEL CLIENTE], período [MES/AÑO]:
-1) El Excel de Comprobantes Emitidos descargado de ARCA (Mis Comprobantes).
-2) El Libro de IVA Ventas generado en Onvio.
-
-Compará los dos archivos comprobante por comprobante y verificá:
-- Que estén TODOS los comprobantes de ARCA en el libro, y que el libro no tenga comprobantes que no estén en ARCA.
-- Que coincidan: fecha de emisión, tipo y letra, punto de venta, número, CUIT/documento del cliente, neto gravado, no gravado/exento, IVA (por alícuota), percepciones y total.
-- Que estén todos los puntos de venta y que no falten números en la secuencia de cada punto de venta.
-- Que no haya comprobantes duplicados.
-- Que todas las fechas correspondan al período.
-- Que las notas de crédito resten (importes con el signo correcto).
-- Cualquier otra cosa rara: importes en cero, tipos de cambio extraños, moneda extranjera, clientes sin CUIT.
-
-Respondé con:
-1) Un resumen: cantidad de comprobantes y total en cada archivo, y la diferencia.
-2) Una tabla SOLO con las diferencias: comprobante (tipo, PV, número), dato, valor en ARCA, valor en el libro.
-3) Una lista de faltantes y sobrantes.
-Si no encontrás diferencias, decilo explícitamente. No inventes datos: si algo no se puede leer, avisame.`;
-
-const PROMPT_COMPRAS = `Sos un asistente contable. Te adjunto, de la empresa [NOMBRE DEL CLIENTE], período [MES/AÑO]:
-1) El Libro de IVA Compras generado en Onvio.
-2) Un archivo ZIP con los comprobantes de compra en PDF.
-
-Abrí cada PDF y comparalo con su línea del libro. Verificá:
-- Que cada PDF esté en el libro y que cada línea del libro tenga su PDF.
-- Que coincidan: fecha de emisión, tipo y letra, punto de venta, número, CUIT y razón social del proveedor, neto gravado (por alícuota), no gravado, exento, IVA, cada percepción o retención (IVA, IIBB por jurisdicción, otras) y total.
-- Que las percepciones estén en el régimen/jurisdicción correcto.
-- Que no haya comprobantes duplicados.
-- Que las fechas correspondan al período (o avisame si hay comprobantes de meses anteriores).
-- Que las notas de crédito resten.
-- Que el CUIT del proveedor no sea el de nuestra propia empresa cliente.
-- Cualquier cosa rara: facturas en dólares y su tipo de cambio, comprobantes ilegibles, facturas B o C con IVA discriminado.
-
-Respondé con:
-1) Un resumen: cantidad de PDFs, cantidad de líneas del libro y totales.
-2) Una tabla SOLO con las diferencias: archivo PDF, comprobante, dato, valor en el PDF, valor en el libro.
-3) Una lista de PDFs sin línea en el libro y de líneas sin PDF.
-Si no encontrás diferencias, decilo explícitamente. No inventes datos: si un PDF no se puede leer, avisame cuál.`;
-
-const PROMPT_REPREGUNTA = `Revisá de nuevo solo el comprobante [TIPO PV-NÚMERO]. Mostrame, lado a lado, los valores que leíste en cada archivo y explicame de dónde sale la diferencia.`;
+/* Tutorial: El sistema de gestión — Integrante
+   Basado en el Manual del Sistema (Estudio Miguel Alonso) y verificado contra el código fuente. */
+const ILUS = `<div class="ilus">recreación ilustrativa del sistema</div>`;
+const menu = (items, activo) => `<div class="side"><div class="lg">Estudio Alonso</div>
+  ${items.map((i) => `<a class="${i[2] === "off" ? "off" : i[0] === activo ? "on" : ""}"><i>${i[1]}</i>${i[0]}</a>`).join("")}</div>`;
+const MENU_INT = [["Dashboard", "▤"], ["Tareas Propias", "✓"], ["Tareas de mi Equipo", "⛁", "off"], ["Clientes", "◐"],
+  ["Vencimientos", "◷"], ["Sectores", "▦"], ["Métricas", "▥", "off"], ["Módulo IA", "✺", "off"],
+  ["Usuarios", "☺", "off"], ["Auditoría", "◈", "off"], ["Soporte", "♻"]];
 
 const TUT = {
-  id: "revision-claude",
-  chapters: ["Bienvenida", "Ingresar a Claude", "Revisar ventas", "Revisar compras", "Buenas prácticas", "Resumen"],
-  recursos: [
-    { t: "Prompt · Ventas (ARCA vs. Libro IVA Ventas)", texto: PROMPT_VENTAS },
-    { t: "Prompt · Compras (Libro IVA Compras vs. PDFs)", texto: PROMPT_COMPRAS },
-    { t: "Prompt · Repreguntar una diferencia", texto: PROMPT_REPREGUNTA },
-  ],
+  id: "gestion-integrante",
+  chapters: ["Bienvenida", "Cómo está organizado", "Entrar y tu Dashboard", "Tareas Propias", "Los tableros de tu sector", "El cronómetro", "El semáforo", "Acceso a otros tableros", "Clientes, vencimientos y soporte", "Resumen"],
   scenes: [
-    E.titulo({ ch: 0, sistema: "Claude", titulo: "Revisión de subdiarios con Claude",
-      tags: ["Ventas y Compras", "+ test final"],
+    E.titulo({ ch: 0, sistema: "Sistema de Gestión", titulo: "El sistema de gestión",
+      tags: ["Rol Integrante", "+ test final"],
       narr: [
-        "Hola. En este tutorial vas a aprender a usar Claude, la inteligencia artificial del equipo, para controlar tus subdiarios antes de enviarlos.",
-        "Los prompts que vas a ver están en el panel «Para copiar», al costado del video. Al final, hay un test.",
+        "Hola. En este tutorial vas a aprender a usar el sistema de gestión operativa del estudio, con el rol de Integrante.",
+        "Es donde vas a ver tus tareas, medir tu tiempo y seguir los vencimientos de tus clientes. Al final, hay un test.",
       ],
-      arte: `<div style="font-weight:700;font-size:20px;color:var(--navy)">Control del subdiario</div>
-        <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap"><span class="file"><b class="x">XLS</b>ARCA</span><span class="file"><b class="x">XLS</b>Libro IVA</span></div>
-        <div style="margin-top:12px;background:var(--paper);border-radius:10px;padding:10px;font-size:15px">✓ 46 de 47 coinciden<br><b style="color:var(--bad)">✗ 1 diferencia de fecha</b></div>` }),
-    E.texto({ ch: 0, eyebrow: "Para qué sirve", titulo: "Un control más rápido y más completo",
-      narr: [
-        "Comparar a mano cientos de comprobantes lleva mucho tiempo, y es fácil que algo se escape.",
-        "Claude puede leer el Excel de ARCA, el libro de IVA y los PDFs, y compararlos línea por línea.",
-        "Te devuelve solo las diferencias, para que te concentres en lo que hay que revisar.",
-        "Pero ojo: Claude es una ayuda. Cada diferencia que marque, la verificás vos en el sistema antes de corregir.",
-      ],
-      items: [
-        "Comparar a mano es lento y se escapan cosas.",
-        "Claude compara <b>línea por línea</b>.",
-        "Te muestra <b>solo las diferencias</b>.",
-        "Vos <b>verificás</b> cada diferencia antes de corregir.",
-      ] }),
+      arte: `<div style="font-weight:700;font-size:20px;color:var(--navy)">Mis tareas de hoy</div>
+        <div style="display:grid;gap:8px;margin-top:12px;font-size:15px">
+          <div style="background:var(--paper);border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between">IVA Compras<span class="sem a"><i></i>Por vencer</span></div>
+          <div style="background:var(--paper);border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between">Conciliación<span class="sem v"><i></i>Al día</span></div>
+          <div style="background:var(--paper);border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between">Libro IVA<span class="sem r"><i></i>Vencida</span></div>
+        </div>` }),
 
-    /* ---------- Ingreso ---------- */
+    /* ---------- Organización ---------- */
     { ch: 1, narr: [
-        "Primero, ingresá a Claude.",
-        "Abrí el navegador y entrá a claude.ai.",
-        "Elegí «Continuar con Google» e ingresá con la cuenta de Google del estudio que tiene acceso al equipo de Claude.",
-        "No uses una cuenta personal: la información de los clientes tiene que quedar dentro de la cuenta del equipo.",
+        "Empecemos por cómo está organizado el sistema. Son cuatro niveles.",
+        "El estudio se divide en Sectores: Contabilidad, Impuestos, Laboral, Sociedades, Administración.",
+        "Cada sector tiene Módulos, que son áreas de trabajo. Y cada módulo, uno o más Tableros.",
+        "El tablero es donde se trabaja: una grilla con columnas, que son los estados, y tarjetas, que son las tareas.",
       ],
-      html: `<div class="split-text"><div class="eyebrow">Ingreso</div><h2 class="h m">Entrá con la cuenta del equipo</h2>
-        ${E.lista(["Entrá a <b>claude.ai</b>.", "<b>Continuar con Google</b>.", "Usá la cuenta del estudio con acceso al equipo, <b>nunca una personal</b>."])}</div>
-        <div class="login"><div style="font-family:var(--f-mono);font-size:14px;color:var(--muted)">claude.ai</div><h5>Te damos la bienvenida</h5>
-          <div class="g rv hl" data-s="2"><svg width="22" height="22" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.6 13.2l7.8 6C12.3 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17.5z"/><path fill="#FBBC05" d="M10.4 28.8A14.5 14.5 0 0 1 9.5 24c0-1.7.3-3.3.9-4.8l-7.8-6A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.8-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.7-4.1-13.6-9.8l-7.8 6C6.6 42.6 14.6 48 24 48z"/></svg>Continuar con Google</div>
-          <div class="or">o</div><div class="em">Ingresá tu email</div>
-          <div class="callout rv" data-s="3" style="position:static;max-width:none;background:var(--bad);font-size:18px">Solo la cuenta del estudio con acceso al equipo</div></div>` },
-    { ch: 1, narr: [
-        "Una vez adentro, empezá un chat nuevo para cada subdiario, así no se mezcla la información de distintos clientes.",
-        "Con el clip del cuadro de mensaje adjuntás los archivos.",
-        "Y en el cuadro escribís, o pegás, el prompt: las instrucciones de lo que querés que haga.",
-      ],
-      html: `<div class="split-text"><div class="eyebrow">El chat</div><h2 class="h m">Un chat nuevo por subdiario</h2>
-        ${E.lista(["<b>Chat nuevo</b> para cada cliente y libro.", "El <b>clip</b> adjunta archivos.", "El <b>prompt</b> dice qué tiene que hacer."], 0)}</div>
-        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Nuevo chat</span></div>
-          <div class="body"><div style="margin:auto;text-align:center;font-family:Georgia,serif;font-size:34px;color:#3D3929">¿En qué puedo ayudarte hoy?</div></div>
-          <div class="compose"><span class="clip rv" data-s="1" style="border:3px solid var(--orange)">📎</span><span class="rv" data-s="2">Pegá acá el prompt…</span><span class="send">↑</span></div></div>` },
-
-    /* ---------- Ventas ---------- */
-    { ch: 2, narr: [
-        "Empecemos por las ventas.",
-        "Adjuntá dos archivos: el Excel de Comprobantes Emitidos que bajaste de ARCA, y el libro de IVA Ventas que generaste en Onvio.",
-        "Pegá el prompt de ventas, reemplazando el nombre del cliente y el período, y envialo.",
-      ],
-      html: `<div class="split-text"><div class="eyebrow">Ventas</div><h2 class="h m">ARCA contra el libro</h2>
-        ${E.lista(["<b>Excel de Emitidos</b> de ARCA.", "<b>Libro IVA Ventas</b> de Onvio.", "Prompt de ventas, con cliente y período."])}</div>
-        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Cliente A · Ventas 07/2026</span></div>
-          <div class="body"><div class="msg u rv" data-s="1"><div class="files"><span class="file"><b class="x">XLSX</b>Mis Comprobantes Emitidos 07-2026</span><span class="file"><b class="x">XLSX</b>Libro IVA Ventas 07-2026</span></div>
-            <span class="rv" data-s="2">Sos un asistente contable. Te adjunto dos archivos de la empresa <b>Cliente A</b>, período <b>07/2026</b>… Compará los dos archivos comprobante por comprobante y verificá…</span></div></div>
-          <div class="compose"><span class="clip">📎</span><span>Responder…</span><span class="send">↑</span></div></div>` },
-    E.texto({ ch: 2, eyebrow: "Qué pedirle en ventas", titulo: "Los puntos que no pueden faltar", tam: "m",
+      html: `<div class="pad"><div class="eyebrow">La jerarquía</div><h2 class="h l">Sector › Módulo › Tablero › Tarea</h2></div>
+        <div class="route" style="top:330px;gap:14px">
+          <span class="crumb rv" data-s="1" style="font-size:30px">Sector<br><small style="font-size:18px;font-family:var(--f-body);font-weight:600">Impuestos</small></span>
+          <span class="arrow rv" data-s="2">›</span>
+          <span class="crumb rv" data-s="2" style="font-size:30px">Módulo<br><small style="font-size:18px;font-family:var(--f-body);font-weight:600">IVA</small></span>
+          <span class="arrow rv" data-s="2">›</span>
+          <span class="crumb rv" data-s="2" style="font-size:30px">Tablero<br><small style="font-size:18px;font-family:var(--f-body);font-weight:600">IVA Compras 2026</small></span>
+          <span class="arrow rv" data-s="3">›</span>
+          <span class="crumb act rv" data-s="3" style="font-size:30px">Tareas<br><small style="font-size:18px;font-family:var(--f-body);font-weight:600">una por cliente</small></span>
+        </div>` },
+    E.tarjetas({ ch: 1, eyebrow: "Tipos de tablero", titulo: "Tres formas de listar el trabajo",
       narr: [
-        "Un buen prompt de ventas le pide a Claude que mire, como mínimo, estos puntos.",
-        "Que estén todos los comprobantes en los dos archivos: que no falte ni sobre ninguno.",
-        "Que coincidan la fecha de emisión, el tipo, el punto de venta y el número.",
-        "Que estén todos los puntos de venta, y que no haya saltos en la numeración.",
-        "Que coincidan los importes: neto, IVA, percepciones y total. Y que las notas de crédito resten.",
-        "Y que avise de cualquier cosa rara: duplicados, importes en cero, moneda extranjera o fechas fuera del período.",
-      ],
-      items: [
-        "Todos los comprobantes: <b>ni faltantes ni sobrantes</b>.",
-        "<b>Fecha de emisión</b>, tipo, <b>punto de venta</b> y número.",
-        "Todos los <b>puntos de venta</b>, sin saltos de numeración.",
-        "Neto, IVA, percepciones y total · <b>NC restando</b>.",
-        "Cualquier cosa rara: duplicados, ceros, moneda, fechas.",
-      ] }),
-    { ch: 2, narr: [
-        "Claude responde con un resumen y una tabla con las diferencias.",
-        "En este ejemplo, encontró una fecha distinta y un comprobante que está en ARCA pero falta en el libro.",
-        "Tu trabajo ahora es verificar cada diferencia en Onvio y en ARCA, y corregir lo que corresponda.",
-      ],
-      html: `<div class="split-text"><div class="eyebrow">La respuesta</div><h2 class="h m">Solo las diferencias</h2>
-        ${E.lista(["Resumen con cantidades y totales.", "Tabla de <b>diferencias</b> y <b>faltantes</b>.", "Vos <b>verificás</b> y corregís en Onvio."])}</div>
-        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Cliente A · Ventas 07/2026</span></div>
-          <div class="body"><div class="msg a">
-            <b>Resumen:</b> ARCA tiene <b>47</b> comprobantes ($ 58.412.300,00); el libro tiene <b>46</b> ($ 58.290.000,00). Diferencia: $ 122.300,00.
-            <table class="tbl rv" data-s="1"><tr><th>Comprobante</th><th>Dato</th><th>ARCA</th><th>Libro</th></tr>
-              <tr><td>FC A 0010-00003086</td><td>Fecha</td><td>26/07/2026</td><td class="bad">27/07/2026</td></tr>
-              <tr><td>FC A 0010-00003071</td><td>Presencia</td><td>$ 122.300,00</td><td class="bad">Falta</td></tr></table>
-            <div class="rv" data-s="1" style="margin-top:8px">Los puntos de venta 0010 y 0015 están completos, sin saltos. No hay duplicados.</div>
-          </div></div>
-          <div class="compose"><span class="clip">📎</span><span>Responder…</span><span class="send">↑</span></div></div>` },
-
-    /* ---------- Compras ---------- */
-    { ch: 3, narr: [
-        "Ahora, las compras. Acá la comparación es distinta: el libro se controla contra los comprobantes reales.",
-        "Juntá todos los PDFs de las facturas de compra del período en un archivo ZIP: seleccionalos, clic derecho, y «Comprimir en archivo ZIP».",
-        "Adjuntá el libro de IVA Compras de Onvio y el ZIP con los PDFs, pegá el prompt de compras y envialo.",
-      ],
-      html: `<div class="split-text"><div class="eyebrow">Compras</div><h2 class="h m">El libro contra los PDFs</h2>
-        ${E.lista(["PDFs del período en un <b>ZIP</b>.", "<b>Libro IVA Compras</b> de Onvio.", "Prompt de compras."])}</div>
-        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Cliente A · Compras 07/2026</span></div>
-          <div class="body"><div class="msg u rv" data-s="2"><div class="files"><span class="file"><b class="x">XLSX</b>Libro IVA Compras 07-2026</span><span class="file"><b class="z">ZIP</b>Comprobantes compras 07-2026 (38 PDF)</span></div>
-            Sos un asistente contable. Te adjunto, de la empresa <b>Cliente A</b>, período <b>07/2026</b>… Abrí cada PDF y comparalo con su línea del libro…</div>
-          <div class="rv" data-s="1" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:auto">${Array.from({ length: 8 }, (_, i) => `<span class="file"><b class="p">PDF</b>FC_${3300 + i}.pdf</span>`).join("")}<span class="file">→ <b class="z">ZIP</b></span></div></div>
-          <div class="compose"><span class="clip">📎</span><span>Responder…</span><span class="send">↑</span></div></div>` },
-    E.texto({ ch: 3, eyebrow: "Qué pedirle en compras", titulo: "Además de lo de ventas…", tam: "m",
-      narr: [
-        "En compras, además de los puntos de ventas, pedile que controle esto.",
-        "Que cada PDF tenga su línea en el libro, y que cada línea tenga su PDF.",
-        "Que cada percepción esté en el régimen y la jurisdicción correctos, por ejemplo Ingresos Brutos CABA o Provincia.",
-        "Que el CUIT del proveedor no sea el de nuestra propia empresa cliente.",
-        "Y que avise si hay facturas en dólares, comprobantes ilegibles o comprobantes de meses anteriores.",
-      ],
-      items: [
-        "Cada <b>PDF</b> con su línea, y cada línea con su PDF.",
-        "Percepciones en el <b>régimen y jurisdicción</b> correctos.",
-        "El proveedor <b>nunca</b> es nuestro propio cliente.",
-        "Dólares, ilegibles y comprobantes de otros meses.",
-      ] }),
-    { ch: 3, narr: [
-        "La respuesta tiene el mismo formato: un resumen y la tabla de diferencias.",
-        "En este caso, encontró una percepción de Ingresos Brutos cargada en la jurisdicción equivocada, y un PDF que no está en el libro.",
-        "Si una diferencia no te cierra, repreguntale sobre ese comprobante en particular: tenés el prompt para repreguntar en el panel lateral.",
-      ],
-      html: `<div class="split-text"><div class="eyebrow">La respuesta</div><h2 class="h m">Diferencias por PDF</h2>
-        ${E.lista(["Percepción en la jurisdicción equivocada.", "PDF sin línea en el libro.", "Si no te cierra: <b>repreguntá</b>."])}</div>
-        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Cliente A · Compras 07/2026</span></div>
-          <div class="body"><div class="msg a">
-            <b>Resumen:</b> 38 PDFs y 37 líneas en el libro.
-            <table class="tbl rv" data-s="1"><tr><th>PDF</th><th>Dato</th><th>PDF</th><th>Libro</th></tr>
-              <tr><td>FC_3302.pdf</td><td>Perc. IIBB</td><td>CABA $ 4.500</td><td class="bad">PBA $ 4.500</td></tr>
-              <tr><td>FC_3307.pdf</td><td>Presencia</td><td>$ 96.800</td><td class="bad">Falta</td></tr></table></div>
-          <div class="msg u rv" data-s="2">Revisá de nuevo solo el comprobante FC A 00012-00003302. Mostrame, lado a lado, los valores…</div></div>
-          <div class="compose"><span class="clip">📎</span><span>Responder…</span><span class="send">↑</span></div></div>` },
-
-    /* ---------- Buenas prácticas ---------- */
-    E.tarjetas({ ch: 4, eyebrow: "Buenas prácticas", titulo: "Para usar Claude bien",
-      narr: [
-        "Cuatro buenas prácticas para cerrar.",
-        "Verificá siempre: Claude puede equivocarse, sobre todo con PDFs escaneados o poco legibles.",
-        "Un chat por subdiario: así no se mezclan clientes ni períodos.",
-        "Sé específico: nombrá el cliente, el período y qué datos comparar. Cuanto más claro el prompt, mejor la respuesta.",
-        "Y cuidá la información: usá solo la cuenta del equipo, nunca una personal.",
+        "Hay tres tipos de tablero.",
+        "Clientes y Tareas: el caso típico. Cada fila es un cliente, para los trabajos que se repiten todos los meses.",
+        "En blanco: cada fila es una tarea con título libre, para listas que no se organizan por cliente.",
+        "Y Personal: tus propios tableros privados, dentro de Tareas Propias.",
       ],
       cards: [
-        { ic: "check", t: "Verificá siempre", p: "Cada diferencia se confirma en Onvio o ARCA." },
-        { ic: "doc", t: "Un chat por subdiario", p: "Sin mezclar clientes ni períodos." },
-        { ic: "lista", t: "Sé específico", p: "Cliente, período y datos a comparar." },
-        { ic: "llave", t: "Cuenta del equipo", p: "Nunca una cuenta personal." },
+        { ic: "persona2", t: "Clientes / Tareas", p: "Una fila por cliente. El cliente es obligatorio." },
+        { ic: "lista", t: "En blanco", p: "Una fila por tarea, con título libre." },
+        { ic: "usuario", t: "Personal", p: "Tus tableros privados, en Tareas Propias." },
       ] }),
 
-    E.resumen({ ch: 5, titulo: "Tu control antes de enviar",
+    /* ---------- Entrar ---------- */
+    { ch: 2, narr: [
+        "Para entrar, abrí la dirección del sistema y escribí tu email y tu contraseña.",
+        "La sesión dura ocho horas. Después de ese tiempo, el sistema te vuelve a pedir el login.",
+        "Ojo con esto: no existe una pantalla para cambiar tu propia contraseña. Si necesitás cambiarla, se la pedís a un Administrador.",
+      ],
+      html: `<div class="split-text"><div class="eyebrow">Ingreso</div><h2 class="h m">Email y contraseña</h2>
+        ${E.lista(["La sesión dura <b>8 horas</b>.", "No hay autogestión de contraseña: la cambia un <b>Administrador</b>.", "Un usuario desactivado no puede entrar, aunque la contraseña sea correcta."])}</div>
+        <div class="login" style="left:600px;top:150px;width:520px">
+          <div style="font-family:var(--f-display);font-weight:800;font-size:26px;color:var(--navy)">Estudio Miguel Alonso</div>
+          <div style="font-size:17px;color:var(--muted);margin-top:-8px">Gestión Operativa</div>
+          <div class="em">Email<div style="color:var(--ink);font-weight:600">vos@estudio.com</div></div>
+          <div class="em">Contraseña<div style="color:var(--ink);letter-spacing:.2em">••••••••••</div></div>
+          <div class="g" style="background:var(--navy);color:#fff;border:0">Iniciar sesión</div>
+        </div>${ILUS}` },
+    { ch: 2, narr: [
+        "Al entrar llegás a tu Dashboard.",
+        "Arriba ves tus indicadores personales: cuántas tareas tenés, cuántas finalizaste, cuántas están pendientes y cuántas vencidas. Se puede hacer clic en cada uno y te lleva al panel de tareas ya filtrado.",
+        "A la izquierda está el menú. Como Integrante ves Dashboard, Tareas Propias, Clientes, Vencimientos, Sectores y Soporte.",
+        "Tareas de mi Equipo, Métricas, Módulo IA, Usuarios y Auditoría no aparecen: son de otros roles.",
+        "Y algo importante: solo ves tus propios datos. No ves las tareas de otras personas ni de otros sectores.",
+      ],
+      html: `<div class="shot-h"><div class="eyebrow">Dashboard</div><h2 class="h">Tu pantalla de inicio</h2></div>
+        <div class="app" style="left:60px;right:60px;top:150px;bottom:60px">
+          ${menu(MENU_INT, "Dashboard")}
+          <div class="main"><div class="ttl">Hola 👋 — tu resumen de hoy</div>
+            <div class="kpis rv" data-s="1">
+              <div class="kpi"><span>Mis tareas</span><b>18</b></div>
+              <div class="kpi"><span>Finalizadas</span><b>11</b></div>
+              <div class="kpi"><span>Pendientes</span><b>7</b></div>
+              <div class="kpi v"><span>Vencidas</span><b>2</b></div>
+            </div>
+            <div class="mini rv" data-s="4">Tu semáforo · solo con tus tareas</div>
+            <div style="display:flex;gap:8px" class="rv" data-s="4">
+              <span class="sem v"><i></i>Al día 9</span><span class="sem a"><i></i>Por vencer 4</span><span class="sem n"><i></i>Vence hoy 1</span><span class="sem r"><i></i>Vencida 2</span></div>
+          </div>
+        </div>${ILUS}` },
+
+    /* ---------- Tareas propias ---------- */
+    { ch: 3, narr: [
+        "Tareas Propias es tu espacio personal.",
+        "La primera vez, el sistema te crea un tablero llamado Reuniones, con tres columnas: Por hacer, En curso y Hecho.",
+        "Podés crear todos los tableros personales que quieras: botón Nuevo tablero, le ponés un nombre y listo.",
+        "Adentro agregás tareas con el botón más: título y, si querés, una fecha de vencimiento.",
+        "Sobre la privacidad: tus tableros personales son tuyos. Tu Líder y el Administrador pueden verlos, solo para acompañarte, pero no pueden editarlos ni mover nada. Nadie más los ve.",
+      ],
+      html: `<div class="shot-h"><div class="eyebrow">Tareas Propias</div><h2 class="h">Tu organizador privado</h2></div>
+        <div class="app" style="left:60px;right:60px;top:150px;bottom:60px">
+          ${menu(MENU_INT, "Tareas Propias")}
+          <div class="main">
+            <div class="ttl">Tareas Propias <span class="pill o" style="font-size:15px;padding:4px 12px">+ Nuevo tablero</span></div>
+            <div class="mini rv" data-s="1">Tablero «Reuniones» · creado automáticamente</div>
+            <div class="kanban rv" data-s="1">
+              <div class="col"><h6>Por hacer <span>2</span></h6>
+                <div class="tk"><b>Preparar reunión con RR. HH.</b><div class="row2"><span>Sin fecha</span></div></div>
+                <div class="tk rv" data-s="3"><b>Pendientes de la semana</b><div class="row2"><span>22 jul</span><span class="sem v"><i></i>Al día</span></div></div></div>
+              <div class="col"><h6>En curso <span>1</span></h6>
+                <div class="tk"><b>Revisar instructivos</b><div class="row2"><span>18 jul</span><span class="sem a"><i></i>Por vencer</span></div></div></div>
+              <div class="col"><h6>Hecho <span>1</span></h6>
+                <div class="tk"><b>Alta de accesos</b><div class="row2"><span>Finalizada</span></div></div></div>
+            </div>
+            <div class="callout rv" data-s="4" style="position:static;max-width:none;font-size:19px">Tu Líder y el Administrador los ven <em>solo de lectura</em>: no pueden editarlos.</div>
+          </div>
+        </div>${ILUS}` },
+
+    /* ---------- Tableros del sector ---------- */
+    { ch: 4, narr: [
+        "Ahora, los tableros de tu sector.",
+        "Por pertenecer a un sector entrás automáticamente a todos sus tableros, sin pedir nada.",
+        "Ahí podés crear tareas nuevas,",
+        "mover una tarea de estado arrastrando la tarjeta entre columnas,",
+        "y asignar el responsable o la fecha de vencimiento. Se guardan solos: no hay botón Guardar.",
+        "También podés comentar y adjuntar archivos, de hasta diez megas cada uno.",
+      ],
+      html: `<div class="shot-h"><div class="eyebrow">Tablero del sector</div><h2 class="h">Trabajar en el tablero</h2></div>
+        <div class="app" style="left:60px;right:60px;top:150px;bottom:60px">
+          ${menu(MENU_INT, "Sectores")}
+          <div class="main">
+            <div class="ttl">IVA Compras 2026 <span class="mini">· Impuestos › IVA</span></div>
+            <div class="kanban">
+              <div class="col"><h6>No empezado <span>2</span></h6>
+                <div class="tk rv" data-s="2" style="border-color:var(--orange)"><b>Comercio Ejemplo SRL</b><div class="row2"><span>15 jul</span><span class="av">MP</span></div></div>
+                <div class="tk"><b>Servicios Test SAS</b><div class="row2"><span>18 jul</span><span class="av">MP</span></div></div></div>
+              <div class="col"><h6>En proceso <span>1</span></h6>
+                <div class="tk ${""}" data-s="3"><b>Empresa Demo S.A.</b><div class="row2"><span class="sem a"><i></i>Por vencer</span><span class="av">MP</span></div></div>
+                <div class="tk drag rv" data-s="3"><b>Comercio Ejemplo SRL</b><div class="row2"><span>arrastrando…</span><span class="av">MP</span></div></div></div>
+              <div class="col"><h6>Finalizado ✓ <span>1</span></h6>
+                <div class="tk"><b>Cliente Norte SA</b><div class="row2"><span>Finalizada</span><span class="av">MP</span></div></div></div>
+            </div>
+            <div style="display:flex;gap:10px" class="rv" data-s="4">
+              <span class="pill n" style="font-size:16px">Responsable ▾</span><span class="pill n" style="font-size:16px">Vencimiento ▾</span>
+              <span class="mini">se guardan solos (autoguardado)</span></div>
+            <div class="callout rv" data-s="5" style="position:static;max-width:none;font-size:19px">Comentarios y adjuntos en el detalle de la tarea · <em>hasta 10 MB</em> por archivo.</div>
+          </div>
+        </div>${ILUS}` },
+    E.alerta({ ch: 4, eyebrow: "Lo único que no podés", titulo: "Eliminar una tarea es cosa del Líder",
+      texto: "Crear, mover, asignar, comentar y adjuntar: todo eso sí. <b>Eliminar</b> una tarea, no: pedíselo a tu Líder o a un Administrador.",
+      narr: [
+        "De todo lo que se hace en un tablero, hay una sola acción que no podés hacer: eliminar una tarea.",
+        "Crear, mover, asignar, comentar y adjuntar, sí. Eliminar, no: se lo pedís a tu Líder o a un Administrador.",
+      ] }),
+
+    /* ---------- Cronómetro ---------- */
+    { ch: 5, narr: [
+        "Cada persona mide su propio tiempo con el cronómetro.",
+        "Hay un botón sobre cada tarjeta y también dentro del detalle de la tarea. Tocás Iniciar y arriba de la pantalla aparece un indicador flotante mientras corre.",
+        "Lo detenés desde ese mismo indicador o desde la tarea.",
+        "Y si movés la tarea a la columna final, el cronómetro se corta solo.",
+      ],
+      html: `<div class="shot-h"><div class="eyebrow">Cronómetro</div><h2 class="h">Medí tu tiempo</h2></div>
+        <div class="timer rv" data-s="1" style="top:120px"><span>⏱</span><span>Empresa Demo S.A.</span><b>00:42:15</b><span class="st">Detener</span></div>
+        <div class="app" style="left:60px;right:60px;top:200px;bottom:60px">
+          ${menu(MENU_INT, "Sectores")}
+          <div class="main">
+            <div class="ttl">IVA Compras 2026</div>
+            <div class="kanban">
+              <div class="col"><h6>No empezado</h6><div class="tk"><b>Servicios Test SAS</b><div class="row2"><span>18 jul</span><span>▶</span></div></div></div>
+              <div class="col"><h6>En proceso</h6><div class="tk rv" data-s="1" style="border-color:var(--orange)"><b>Empresa Demo S.A.</b><div class="row2"><span class="sem a"><i></i>Por vencer</span><span style="color:var(--orange);font-weight:700">⏱ corriendo</span></div></div></div>
+              <div class="col"><h6>Finalizado ✓</h6><div class="tk rv" data-s="3"><b>Cliente Norte SA</b><div class="row2"><span>Finalizada</span><span class="mini">⏹ cronómetro cortado</span></div></div></div>
+            </div>
+          </div>
+        </div>${ILUS}` },
+    E.tarjetas({ ch: 5, eyebrow: "Dos reglas del cronómetro", titulo: "Para que el tiempo quede bien",
+      narr: [
+        "Dos reglas para tener en cuenta.",
+        "Primera: un solo cronómetro a la vez. Si arrancás uno nuevo mientras tenías otro corriendo, aunque sea en otra pestaña, el sistema cierra el anterior automáticamente. Así nunca queda uno olvidado sumando horas.",
+        "Segunda: los botones rápidos de carga manual —más quince, más treinta, más sesenta minutos— solo aparecen en tus tableros personales, o si sos Líder o Administrador.",
+        "En un tablero de sector, vos medís con el cronómetro, no a mano.",
+      ],
+      cards: [
+        { ic: "reloj", t: "Uno solo a la vez", p: "Al iniciar otro, el anterior se cierra automáticamente." },
+        { ic: "x", t: "Sin carga manual", p: "Los botones +15m / +30m / +60m no están en tableros de sector." },
+        { ic: "check", t: "Se corta solo", p: "Al pasar la tarea al estado final." },
+      ] }),
+
+    /* ---------- Semáforo ---------- */
+    { ch: 6, narr: [
+        "El semáforo es el lenguaje visual del sistema: cada tarea con fecha de vencimiento se colorea sola.",
+        "Verde, al día: faltan más de tres días.",
+        "Amarillo, por vencer: faltan de uno a tres días.",
+        "Naranja: vence hoy.",
+        "Rojo, vencida: hasta siete días de atraso. Y rojo oscuro, muy vencida: más de siete días.",
+        "Cuando la tarea llega a su estado final, el semáforo desaparece. Se cuenta en días corridos, no hábiles.",
+      ],
+      html: `<div class="pad"><div class="eyebrow">Semáforo</div><h2 class="h l">El color te dice cuánto falta</h2></div>
+        <div class="flow" style="top:320px;gap:10px">
+          <div class="fs rv" data-s="1"><span class="sem v" style="font-size:20px"><i></i>Al día</span><b style="font-size:24px">+ de 3 días</b></div>
+          <div class="fs rv" data-s="2"><span class="sem a" style="font-size:20px"><i></i>Por vencer</span><b style="font-size:24px">1 a 3 días</b></div>
+          <div class="fs rv" data-s="3"><span class="sem n" style="font-size:20px"><i></i>Vence hoy</span><b style="font-size:24px">0 días</b></div>
+          <div class="fs rv" data-s="4"><span class="sem r" style="font-size:20px"><i></i>Vencida</span><b style="font-size:24px">hasta 7 de atraso</b></div>
+          <div class="fs rv" data-s="4"><span class="sem ro" style="font-size:20px"><i></i>Muy vencida</span><b style="font-size:24px">+ de 7</b></div>
+        </div>
+        <div class="callout rv" data-s="5" style="left:80px;right:80px;bottom:60px;max-width:none">Al finalizar la tarea, el semáforo <em>desaparece</em> · se cuentan días corridos</div>` },
+
+    /* ---------- Accesos ---------- */
+    { ch: 7, narr: [
+        "¿Y si necesitás entrar a un tablero de otro sector?",
+        "El sistema no te deja pasar directo: te muestra la pantalla de Acceso restringido.",
+        "Tocás Pedir acceso y se genera una solicitud.",
+        "Cuando un Líder o un Administrador la aprueba, el tablero se habilita solo, sin que tengas que hacer nada más.",
+        "Un detalle práctico: hoy ese pedido no manda un mail automático. Si es urgente, avisale también a tu Líder.",
+      ],
+      html: `<div class="shot-h"><div class="eyebrow">Otros sectores</div><h2 class="h">Pedir acceso a un tablero</h2></div>
+        <div class="app" style="left:60px;right:60px;top:150px;bottom:60px">
+          ${menu(MENU_INT, "Sectores")}
+          <div class="main" style="justify-content:center">
+            <div class="lock rv" data-s="1"><div class="ic2">🔒</div><h5>Acceso restringido</h5>
+              <p>No tenés acceso a este tablero todavía.</p>
+              <span class="b2 rv" data-s="2">Pedir acceso</span>
+              <div class="rv" data-s="3" style="margin-top:14px;color:var(--ok);font-weight:700">✓ Solicitud enviada — queda pendiente de aprobación</div></div>
+          </div>
+        </div>${ILUS}` },
+
+    /* ---------- Clientes, vencimientos, soporte ---------- */
+    { ch: 8, narr: [
+        "Clientes y Vencimientos los ves completos, igual que cualquier otro rol: la lectura es libre para todo el estudio.",
+        "Pero hay una sola cosa que podés modificar ahí: marcar un vencimiento como Presentado, o volverlo a Pendiente.",
+        "Y solo en los impuestos donde vos figurás como responsable.",
+        "Todo lo demás —cargar clientes, asignarles impuestos, editar la agenda de ARCA, reasignar responsables o enviar los resúmenes— lo hacen el Líder y el Administrador.",
+      ],
+      html: `<div class="shot-h"><div class="eyebrow">Vencimientos</div><h2 class="h">Lo que podés tocar</h2></div>
+        <div class="app" style="left:60px;right:60px;top:150px;bottom:60px">
+          ${menu(MENU_INT, "Vencimientos")}
+          <div class="main">
+            <div class="ttl">Vencimientos impositivos</div>
+            <table class="tbl2"><tr><th>Vence</th><th>Cliente</th><th>Impuesto</th><th>Responsable</th><th>Estado</th></tr>
+              <tr class="rv" data-s="1"><td>15 jul</td><td>Empresa Demo S.A.</td><td>IVA</td><td>Vos</td><td><span class="pill2 ok">Presentado ✓</span></td></tr>
+              <tr><td>18 jul</td><td>Comercio Ejemplo SRL</td><td>IIBB</td><td>Vos</td><td><span class="pill2">Pendiente</span></td></tr>
+              <tr class="rv" data-s="2" style="opacity:.55"><td>20 jul</td><td>Servicios Test SAS</td><td>IVA</td><td>Otra persona</td><td><span class="pill2">Pendiente 🔒</span></td></tr>
+            </table>
+            <div class="callout rv" data-s="2" style="position:static;max-width:none;font-size:19px">Solo cambiás el estado de <em>los impuestos donde sos responsable</em>.</div>
+          </div>
+        </div>${ILUS}` },
+    { ch: 8, narr: [
+        "Por último, el Soporte.",
+        "Si algo no funciona o tenés una duda del sistema, se pide desde Soporte: no por WhatsApp ni por mail.",
+        "Creás un ticket con título, descripción y prioridad. El equipo técnico te responde en el mismo hilo, y queda todo el historial.",
+        "Si el ticket estaba resuelto y volvés a escribir, se reabre solo.",
+      ],
+      html: `<div class="split-text"><div class="eyebrow">Soporte</div><h2 class="h m">Los problemas se piden por ticket</h2>
+        ${E.lista(["Soporte › <b>Nuevo ticket</b>.", "Título, descripción y <b>prioridad</b>.", "Queda el hilo y el historial.", "Si volvés a escribir en uno resuelto, <b>se reabre</b>."])}</div>
+        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>Soporte · Ticket #128 · Prioridad Media</span></div>
+          <div class="body"><div class="msg u rv" data-s="1">El botón de exportar en Métricas no responde.</div>
+            <div class="msg a rv" data-s="2">Soporte técnico: ¿Podés decirme en qué navegador te pasa?</div></div>
+          <div class="compose"><span class="clip">📎</span><span>Escribí tu respuesta…</span><span class="send">↑</span></div></div>${ILUS}` },
+
+    E.resumen({ ch: 9, titulo: "Tu día a día en el sistema",
       filas: [
-        ["Ingreso", "claude.ai · <em>Continuar con Google</em> · cuenta del equipo"],
-        ["Ventas", "Excel de Emitidos (ARCA) + Libro IVA Ventas"],
-        ["Compras", "Libro IVA Compras + <em>&nbsp;ZIP con los PDFs</em>"],
-        ["Prompt", "Fechas, puntos de venta, faltantes, importes, rarezas"],
-        ["Después", "<em>Verificá</em> cada diferencia y corregí"],
+        ["Entrar", "Email y contraseña · sesión de <em>&nbsp;8 horas</em>"],
+        ["Tu sector", "Entrás solo a sus tableros: crear, mover, asignar, comentar"],
+        ["Tiempo", "Cronómetro · <em>&nbsp;uno solo a la vez</em>"],
+        ["Semáforo", "Verde +3 días · amarillo 1 a 3 · naranja hoy · rojo vencida"],
+        ["Otro sector", "Pantalla de acceso restringido › <em>&nbsp;Pedir acceso</em>"],
+        ["Ayuda", "Soporte › nuevo ticket"],
       ],
       narr: [
         "Repasemos.",
-        "Ingresás a claude.ai con la cuenta de Google del equipo.",
-        "Para ventas, adjuntás el Excel de Emitidos de ARCA y el libro de IVA Ventas.",
-        "Para compras, el libro de IVA Compras y un ZIP con los PDFs.",
-        "El prompt pide revisar fechas, puntos de venta, faltantes, importes y cualquier cosa rara.",
-        "Y cada diferencia la verificás vos antes de corregir y enviar. Ahora, al test.",
+        "Entrás con email y contraseña, y la sesión dura ocho horas.",
+        "A los tableros de tu sector entrás solo: podés crear, mover, asignar y comentar.",
+        "El tiempo se mide con el cronómetro, y hay uno solo a la vez.",
+        "El semáforo te dice cuánto falta: verde, amarillo, naranja y rojo.",
+        "Si necesitás un tablero de otro sector, lo pedís desde la pantalla de acceso restringido.",
+        "Y si algo no anda, abrís un ticket en Soporte. Ahora, al test.",
       ] }),
   ],
 
   quiz: [
-    { ch: 2, short: "Archivos para ventas",
-      q: "Vas a controlar el subdiario de IVA Ventas. ¿Qué archivos le adjuntás a Claude?",
-      why: "Para ventas se compara el Excel de Comprobantes Emitidos de ARCA con el libro de IVA Ventas de Onvio.",
-      opts: [
-        { t: "El Excel de Emitidos de ARCA y el libro de IVA Ventas de Onvio.", ok: true },
-        { t: "El Excel de Recibidos de ARCA y el libro de IVA Ventas.", why: "Recibidos son las compras." },
-        { t: "Solo el libro de IVA Ventas.", why: "Sin la información de origen no hay contra qué comparar." },
-        { t: "Un ZIP con los PDFs de compras.", why: "Eso corresponde al control de compras." },
-      ] },
-    { ch: 3, short: "Archivos para compras",
-      q: "¿Y para el subdiario de IVA Compras?",
-      why: "Para compras se envía el libro de IVA Compras junto con los comprobantes en PDF comprimidos en un ZIP.",
-      opts: [
-        { t: "El libro de IVA Compras y un ZIP con los PDFs de los comprobantes.", ok: true },
-        { t: "El Excel de Recibidos de ARCA y el libro de IVA Compras.", why: "El control de compras se hace contra los comprobantes reales." },
-        { t: "Los PDFs, sin el libro.", why: "Sin el libro no hay nada que controlar." },
-        { t: "El libro de IVA Ventas.", why: "Ese es el de ventas." },
-      ] },
-    { ch: 1, short: "Qué cuenta usar",
-      q: "Tenés una cuenta personal de Claude en tu casa. ¿Podés usarla para revisar un subdiario?",
-      why: "Hay que usar la cuenta de Google del estudio con acceso al equipo: la información de los clientes no debe salir de ahí.",
-      opts: [
-        { t: "No: solo la cuenta del estudio con acceso al equipo.", ok: true },
-        { t: "Sí, si borro el chat después.", why: "La información ya habría salido de la cuenta del equipo." },
-        { t: "Sí, si es desde la computadora del estudio.", why: "Lo que importa es la cuenta, no la computadora." },
-        { t: "Sí, solo para compras.", why: "Aplica a todos los subdiarios." },
-      ] },
-    { ch: 4, short: "Claude marca una diferencia",
-      scene: "Claude dice que la FC A 0010-00003086 tiene fecha 27/07 en el libro y 26/07 en ARCA.",
+    { ch: 7, short: "Tablero de otro sector",
+      scene: "Te piden colaborar en un caso de otro sector y al abrir su tablero ves «Acceso restringido».",
       q: "¿Qué hacés?",
-      why: "Claude es una ayuda: cada diferencia se verifica en el sistema antes de corregir.",
+      why: "Se toca «Pedir acceso»: la solicitud la aprueba un Líder o un Administrador y el tablero se habilita solo.",
       opts: [
-        { t: "Lo verifico en ARCA y en Onvio, y corrijo si corresponde.", ok: true },
-        { t: "Corrijo en Onvio sin mirar.", why: "Claude puede equivocarse: hay que verificar." },
-        { t: "Lo ignoro: seguro es un error de Claude.", why: "Puede ser una diferencia real." },
-        { t: "Envío el subdiario y aviso al revisor que Claude encontró algo.", why: "Primero verificás y corregís vos." },
+        { t: "Toco «Pedir acceso» y espero la aprobación.", ok: true },
+        { t: "Le pido a un compañero de ese sector que cargue mis tareas.", why: "Podés tener acceso propio: se solicita desde esa pantalla." },
+        { t: "Creo un tablero igual en mi sector.", why: "Duplicaría el trabajo del otro equipo." },
+        { t: "Cambio mi sector desde mi perfil.", why: "El sector lo asigna un Administrador, y no es lo que necesitás." },
       ] },
-    { ch: 2, short: "Mejor prompt",
-      q: "¿Cuál de estos prompts es mejor para controlar ventas?",
-      why: "Un buen prompt nombra cliente y período, y dice qué comparar y cómo devolver el resultado.",
+    { ch: 5, short: "Dos cronómetros",
+      scene: "Tenías el cronómetro corriendo en una tarea y arrancás otro en una tarea distinta, en otra pestaña.",
+      q: "¿Qué pasa con el primero?",
+      why: "Solo puede haber un cronómetro activo por persona: al iniciar uno nuevo, el sistema cierra automáticamente el anterior.",
       opts: [
-        { t: "«Compará el Excel de ARCA con el libro de Cliente A, 07/2026: fechas, PV, números, importes y faltantes; devolvé solo las diferencias en una tabla».", ok: true },
-        { t: "«Fijate si está bien».", why: "No dice qué comparar ni cómo responder." },
-        { t: "«Resumime estos archivos».", why: "Un resumen no es un control." },
-        { t: "«Corregí el libro».", why: "Claude no corrige en Onvio: el control y la corrección los hacés vos." },
+        { t: "El sistema lo cierra solo: queda uno activo.", ok: true },
+        { t: "Siguen los dos corriendo.", why: "El sistema no permite dos sesiones abiertas a la vez." },
+        { t: "El nuevo no arranca hasta que detenga el otro.", why: "Sí arranca: el anterior se cierra." },
+        { t: "Se borra el tiempo del primero.", why: "El tiempo ya medido queda registrado." },
       ] },
-    { ch: 4, short: "Chats y clientes",
-      q: "Terminaste de controlar Cliente A y seguís con Cliente B. ¿Qué hacés?",
-      why: "Conviene un chat nuevo por subdiario para no mezclar clientes ni períodos.",
+    { ch: 5, short: "Cargar tiempo a mano",
+      q: "En un tablero de tu sector no te aparecen los botones +15m / +30m / +60m. ¿Por qué?",
+      why: "La carga manual de tiempo solo está en tableros personales o para Líder y Administrador. En un tablero de sector, el Integrante mide con el cronómetro.",
       opts: [
-        { t: "Abro un chat nuevo para Cliente B.", ok: true },
-        { t: "Sigo en el mismo chat y adjunto los archivos nuevos.", why: "Se pueden mezclar datos de los dos clientes." },
-        { t: "Adjunto los dos clientes juntos para ganar tiempo.", why: "Aumenta el riesgo de confusión." },
-        { t: "Borro el chat anterior y reutilizo el prompt sin cambiarlo.", why: "El prompt tiene que nombrar el cliente y el período correctos." },
+        { t: "Porque como Integrante, en tableros de sector se mide con el cronómetro.", ok: true },
+        { t: "Porque la tarea no tiene responsable.", why: "No depende del responsable." },
+        { t: "Porque hay que finalizar la tarea primero.", why: "No tiene relación con el estado." },
+        { t: "Es un error del sistema: hay que abrir un ticket.", why: "Es el comportamiento esperado." },
       ] },
-    { ch: 3, short: "Proveedor igual al cliente",
-      q: "¿Por qué el prompt de compras pide verificar que el CUIT del proveedor no sea el de nuestra empresa cliente?",
-      why: "En compras, la empresa cliente es la receptora: su CUIT nunca debe aparecer como proveedor. Si pasa, hay un error de carga.",
+    { ch: 8, short: "Vencimiento de otra persona",
+      scene: "Ves que un vencimiento de IVA figura como Pendiente, pero el responsable es otra persona y ya lo presentó.",
+      q: "¿Qué hacés?",
+      why: "Como Integrante solo podés cambiar el estado de los impuestos donde vos sos responsable: hay que avisarle a esa persona o al Líder.",
       opts: [
-        { t: "Porque la empresa cliente es la receptora: si figura como proveedor, hay un error.", ok: true },
-        { t: "Porque ARCA lo exige en el prompt.", why: "Es un control interno de calidad." },
-        { t: "Porque así Claude lee más rápido.", why: "No tiene que ver con la velocidad." },
-        { t: "No hace falta verificarlo.", why: "Es un error frecuente y conviene detectarlo." },
+        { t: "Le aviso al responsable o a mi Líder para que lo marquen.", ok: true },
+        { t: "Lo marco como Presentado yo.", why: "El sistema solo te deja marcar los tuyos." },
+        { t: "Cambio el responsable a mi nombre y lo marco.", why: "Reasignar responsables es tarea de Líder o Administrador." },
+        { t: "Lo dejo así: no es mi problema.", why: "Avisar evita que quede mal informado." },
+      ] },
+    { ch: 6, short: "Color del semáforo",
+      q: "Hoy es 15 de julio y una tarea vence el 17. ¿De qué color la vas a ver?",
+      why: "Faltan 2 días: entre 1 y 3 días el semáforo es amarillo, «Por vencer».",
+      opts: [
+        { t: "Amarillo · Por vencer", ok: true },
+        { t: "Verde · Al día", why: "El verde es cuando faltan más de 3 días." },
+        { t: "Naranja · Vence hoy", why: "El naranja es el mismo día del vencimiento." },
+        { t: "Rojo · Vencida", why: "El rojo aparece recién cuando pasó la fecha." },
+      ] },
+    { ch: 4, short: "Eliminar una tarea",
+      q: "Cargaste una tarea duplicada en un tablero del sector y querés borrarla. ¿Podés?",
+      why: "Eliminar tareas está reservado a Líder y Administrador; es la única acción de tareas que un Integrante no tiene.",
+      opts: [
+        { t: "No: se lo pido a mi Líder o a un Administrador.", ok: true },
+        { t: "Sí, desde el menú de la tarjeta.", why: "Esa opción no está disponible para el rol Integrante." },
+        { t: "Sí, moviéndola a la columna final.", why: "Eso la finaliza, no la elimina." },
+        { t: "Sí, si la creé yo.", why: "No depende de quién la creó." },
+      ] },
+    { ch: 2, short: "Cambiar la contraseña",
+      q: "Querés cambiar tu contraseña del sistema. ¿Dónde lo hacés?",
+      why: "No hay autogestión de contraseña: la actualiza un Administrador desde Usuarios.",
+      opts: [
+        { t: "En ningún lado: se la pido a un Administrador.", ok: true },
+        { t: "En mi perfil, arriba a la derecha.", why: "Esa pantalla no existe en el sistema." },
+        { t: "Con «¿Olvidaste tu contraseña?» en el login.", why: "El sistema no tiene recupero automático." },
+        { t: "Abriendo un ticket al proveedor de Onvio.", why: "Es otro sistema: esto lo resuelve un Administrador del estudio." },
+      ] },
+    { ch: 3, short: "Privacidad de los tableros personales",
+      q: "¿Quién puede ver y tocar tus tableros de «Tareas Propias»?",
+      why: "Son privados: tu Líder y el Administrador pueden verlos solo de lectura, y nadie más los ve.",
+      opts: [
+        { t: "Mi Líder y el Administrador los ven, pero no pueden editarlos. Nadie más los ve.", ok: true },
+        { t: "Todo mi sector los ve y los puede editar.", why: "Son personales: el sector no los ve." },
+        { t: "Nadie más que yo, en ningún caso.", why: "Líder y Administrador pueden verlos, solo de lectura." },
+        { t: "Cualquiera con el link.", why: "El sistema no comparte tableros por link." },
       ] },
   ],
 };

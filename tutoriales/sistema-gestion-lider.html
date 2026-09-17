@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Revisión de subdiarios con Claude</title>
+<title>El sistema de gestión para líderes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=JetBrains+Mono:wght@500&family=Source+Sans+3:wght@400;600;700&display=swap">
@@ -406,12 +406,12 @@ body.cap *{animation:none!important;transition:none!important}
 
 <header class="top">
   <div class="brand"><span class="mk">EMA</span><div>Estudio Miguel Alonso<small>Tutoriales internos</small></div></div>
-  <div class="top-r"><a class="back" href="../index.html">← Onboarding Contabilidad</a><span class="tag">Claude · Control de calidad</span></div>
+  <div class="top-r"><a class="back" href="../index.html">← Onboarding Contabilidad</a><span class="tag">Sistema de Gestión · Líder</span></div>
 </header>
 
 <section class="head">
-  <h1>Revisión de subdiarios con Claude</h1>
-  <p>Cómo ingresar a Claude con la cuenta del equipo y usarlo para comparar el libro de IVA Ventas contra ARCA, y el de IVA Compras contra los PDFs. Con prompts listos para copiar.</p>
+  <h1>El sistema de gestión para líderes</h1>
+  <p>Módulos y tableros de tu sector, configuración de estados, supervisión del equipo, accesos, reinicio mensual, vencimientos impositivos y envíos a clientes.</p>
 </section>
 
 <div class="layout">
@@ -454,7 +454,7 @@ body.cap *{animation:none!important;transition:none!important}
 
 <section class="quiz" id="quiz" aria-label="Test final"></section>
 
-<footer class="foot"><span>© Estudio Miguel Alonso · Material de capacitación interna</span><span>Proceso interno de Contabilidad</span></footer>
+<footer class="foot"><span>© Estudio Miguel Alonso · Material de capacitación interna</span><span>Basado en el Manual del Sistema del estudio</span></footer>
 
 <script>
 const IMG = {};
@@ -573,290 +573,375 @@ const E = (() => {
   return { titulo, texto, tarjetas, ruta, alerta, captura, lista, resumen, ICONOS, pad };
 })();
 
-/* Tutorial: Revisión de subdiarios con Claude */
-const PROMPT_VENTAS = `Sos un asistente contable. Te adjunto dos archivos de la empresa [NOMBRE DEL CLIENTE], período [MES/AÑO]:
-1) El Excel de Comprobantes Emitidos descargado de ARCA (Mis Comprobantes).
-2) El Libro de IVA Ventas generado en Onvio.
-
-Compará los dos archivos comprobante por comprobante y verificá:
-- Que estén TODOS los comprobantes de ARCA en el libro, y que el libro no tenga comprobantes que no estén en ARCA.
-- Que coincidan: fecha de emisión, tipo y letra, punto de venta, número, CUIT/documento del cliente, neto gravado, no gravado/exento, IVA (por alícuota), percepciones y total.
-- Que estén todos los puntos de venta y que no falten números en la secuencia de cada punto de venta.
-- Que no haya comprobantes duplicados.
-- Que todas las fechas correspondan al período.
-- Que las notas de crédito resten (importes con el signo correcto).
-- Cualquier otra cosa rara: importes en cero, tipos de cambio extraños, moneda extranjera, clientes sin CUIT.
-
-Respondé con:
-1) Un resumen: cantidad de comprobantes y total en cada archivo, y la diferencia.
-2) Una tabla SOLO con las diferencias: comprobante (tipo, PV, número), dato, valor en ARCA, valor en el libro.
-3) Una lista de faltantes y sobrantes.
-Si no encontrás diferencias, decilo explícitamente. No inventes datos: si algo no se puede leer, avisame.`;
-
-const PROMPT_COMPRAS = `Sos un asistente contable. Te adjunto, de la empresa [NOMBRE DEL CLIENTE], período [MES/AÑO]:
-1) El Libro de IVA Compras generado en Onvio.
-2) Un archivo ZIP con los comprobantes de compra en PDF.
-
-Abrí cada PDF y comparalo con su línea del libro. Verificá:
-- Que cada PDF esté en el libro y que cada línea del libro tenga su PDF.
-- Que coincidan: fecha de emisión, tipo y letra, punto de venta, número, CUIT y razón social del proveedor, neto gravado (por alícuota), no gravado, exento, IVA, cada percepción o retención (IVA, IIBB por jurisdicción, otras) y total.
-- Que las percepciones estén en el régimen/jurisdicción correcto.
-- Que no haya comprobantes duplicados.
-- Que las fechas correspondan al período (o avisame si hay comprobantes de meses anteriores).
-- Que las notas de crédito resten.
-- Que el CUIT del proveedor no sea el de nuestra propia empresa cliente.
-- Cualquier cosa rara: facturas en dólares y su tipo de cambio, comprobantes ilegibles, facturas B o C con IVA discriminado.
-
-Respondé con:
-1) Un resumen: cantidad de PDFs, cantidad de líneas del libro y totales.
-2) Una tabla SOLO con las diferencias: archivo PDF, comprobante, dato, valor en el PDF, valor en el libro.
-3) Una lista de PDFs sin línea en el libro y de líneas sin PDF.
-Si no encontrás diferencias, decilo explícitamente. No inventes datos: si un PDF no se puede leer, avisame cuál.`;
-
-const PROMPT_REPREGUNTA = `Revisá de nuevo solo el comprobante [TIPO PV-NÚMERO]. Mostrame, lado a lado, los valores que leíste en cada archivo y explicame de dónde sale la diferencia.`;
+/* Tutorial: El sistema de gestión — Líder
+   Basado en el Manual del Sistema (Estudio Miguel Alonso) y verificado contra el código fuente. */
+const ILUS = `<div class="ilus">recreación ilustrativa del sistema</div>`;
+const menu = (activo) => `<div class="side"><div class="lg">Estudio Alonso</div>
+  ${[["Dashboard", "▤"], ["Tareas Propias", "✓"], ["Tareas de mi Equipo", "⛁"], ["Clientes", "◐"], ["Vencimientos", "◷"],
+     ["Sectores", "▦"], ["Métricas", "▥"], ["Módulo IA", "✺", "off"], ["Usuarios", "☺", "off"], ["Auditoría", "◈", "off"], ["Soporte", "♻"]]
+    .map((i) => `<a class="${i[2] === "off" ? "off" : i[0] === activo ? "on" : ""}"><i>${i[1]}</i>${i[0]}</a>`).join("")}</div>`;
 
 const TUT = {
-  id: "revision-claude",
-  chapters: ["Bienvenida", "Ingresar a Claude", "Revisar ventas", "Revisar compras", "Buenas prácticas", "Resumen"],
-  recursos: [
-    { t: "Prompt · Ventas (ARCA vs. Libro IVA Ventas)", texto: PROMPT_VENTAS },
-    { t: "Prompt · Compras (Libro IVA Compras vs. PDFs)", texto: PROMPT_COMPRAS },
-    { t: "Prompt · Repreguntar una diferencia", texto: PROMPT_REPREGUNTA },
-  ],
+  id: "gestion-lider",
+  chapters: ["Bienvenida", "Tu sector: módulos y tableros", "Configurar un tablero", "Tu equipo y las métricas", "Accesos", "Reinicio mensual", "Vencimientos impositivos", "Recordatorios e importaciones", "Resumen"],
   scenes: [
-    E.titulo({ ch: 0, sistema: "Claude", titulo: "Revisión de subdiarios con Claude",
-      tags: ["Ventas y Compras", "+ test final"],
+    E.titulo({ ch: 0, sistema: "Sistema de Gestión", titulo: "El sistema de gestión para líderes",
+      tags: ["Rol Líder", "+ test final"],
       narr: [
-        "Hola. En este tutorial vas a aprender a usar Claude, la inteligencia artificial del equipo, para controlar tus subdiarios antes de enviarlos.",
-        "Los prompts que vas a ver están en el panel «Para copiar», al costado del video. Al final, hay un test.",
+        "Hola. Este tutorial es para el rol de Líder del sistema de gestión.",
+        "Da por sabido todo lo del tutorial de Integrante: acá vemos lo que se suma. Al final, hay un test.",
       ],
-      arte: `<div style="font-weight:700;font-size:20px;color:var(--navy)">Control del subdiario</div>
-        <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap"><span class="file"><b class="x">XLS</b>ARCA</span><span class="file"><b class="x">XLS</b>Libro IVA</span></div>
-        <div style="margin-top:12px;background:var(--paper);border-radius:10px;padding:10px;font-size:15px">✓ 46 de 47 coinciden<br><b style="color:var(--bad)">✗ 1 diferencia de fecha</b></div>` }),
-    E.texto({ ch: 0, eyebrow: "Para qué sirve", titulo: "Un control más rápido y más completo",
+      arte: `<div style="font-weight:700;font-size:20px;color:var(--navy)">Mi sector · Impuestos</div>
+        <div style="display:grid;gap:8px;margin-top:12px;font-size:15px">
+          <div style="background:var(--paper);border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between">Tareas del sector<b>124</b></div>
+          <div style="background:var(--paper);border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between">Vencidas<b style="color:var(--bad)">6</b></div>
+          <div style="background:var(--paper);border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between">Equipo<b>5 personas</b></div>
+        </div>` }),
+    E.texto({ ch: 0, eyebrow: "Qué se suma", titulo: "Sos el dueño de tu sector",
       narr: [
-        "Comparar a mano cientos de comprobantes lleva mucho tiempo, y es fácil que algo se escape.",
-        "Claude puede leer el Excel de ARCA, el libro de IVA y los PDFs, y compararlos línea por línea.",
-        "Te devuelve solo las diferencias, para que te concentres en lo que hay que revisar.",
-        "Pero ojo: Claude es una ayuda. Cada diferencia que marque, la verificás vos en el sistema antes de corregir.",
+        "Como Líder tenés todo lo de un Integrante, más la responsabilidad de darle forma a tu sector.",
+        "Armás su estructura: módulos y tableros.",
+        "Supervisás a tu equipo, con dos pantallas nuevas en el menú: Tareas de mi Equipo y Métricas.",
+        "Gestionás los accesos, el cierre de mes y los vencimientos impositivos.",
+        "Y manejás las comunicaciones a clientes: el resumen mensual y los recordatorios de documentación.",
       ],
       items: [
-        "Comparar a mano es lento y se escapan cosas.",
-        "Claude compara <b>línea por línea</b>.",
-        "Te muestra <b>solo las diferencias</b>.",
-        "Vos <b>verificás</b> cada diferencia antes de corregir.",
+        "Estructura: <b>módulos y tableros</b> de tu sector.",
+        "Equipo: <b>Tareas de mi Equipo</b> y <b>Métricas</b>.",
+        "Accesos, <b>reinicio mensual</b> y vencimientos.",
+        "Envíos a clientes: resumen y recordatorios.",
       ] }),
 
-    /* ---------- Ingreso ---------- */
+    /* ---------- Estructura ---------- */
     { ch: 1, narr: [
-        "Primero, ingresá a Claude.",
-        "Abrí el navegador y entrá a claude.ai.",
-        "Elegí «Continuar con Google» e ingresá con la cuenta de Google del estudio que tiene acceso al equipo de Claude.",
-        "No uses una cuenta personal: la información de los clientes tiene que quedar dentro de la cuenta del equipo.",
+        "Empecemos por la estructura. Entrá a Sectores y abrí tu sector.",
+        "Con Nuevo módulo creás un área de trabajo: por ejemplo, Contabilidad General.",
+        "Dentro del módulo, con el botón Tablero, creás el tablero y elegís la plantilla.",
+        "Si elegís Clientes y Tareas, el sistema siembra tres columnas: No empezado, En proceso y Finalizado, esta última marcada como final. Si elegís En blanco, lo armás desde cero.",
+        "Y con los íconos de lápiz y tacho renombrás o borrás.",
       ],
-      html: `<div class="split-text"><div class="eyebrow">Ingreso</div><h2 class="h m">Entrá con la cuenta del equipo</h2>
-        ${E.lista(["Entrá a <b>claude.ai</b>.", "<b>Continuar con Google</b>.", "Usá la cuenta del estudio con acceso al equipo, <b>nunca una personal</b>."])}</div>
-        <div class="login"><div style="font-family:var(--f-mono);font-size:14px;color:var(--muted)">claude.ai</div><h5>Te damos la bienvenida</h5>
-          <div class="g rv hl" data-s="2"><svg width="22" height="22" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.6 13.2l7.8 6C12.3 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17.5z"/><path fill="#FBBC05" d="M10.4 28.8A14.5 14.5 0 0 1 9.5 24c0-1.7.3-3.3.9-4.8l-7.8-6A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.8-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.7-4.1-13.6-9.8l-7.8 6C6.6 42.6 14.6 48 24 48z"/></svg>Continuar con Google</div>
-          <div class="or">o</div><div class="em">Ingresá tu email</div>
-          <div class="callout rv" data-s="3" style="position:static;max-width:none;background:var(--bad);font-size:18px">Solo la cuenta del estudio con acceso al equipo</div></div>` },
-    { ch: 1, narr: [
-        "Una vez adentro, empezá un chat nuevo para cada subdiario, así no se mezcla la información de distintos clientes.",
-        "Con el clip del cuadro de mensaje adjuntás los archivos.",
-        "Y en el cuadro escribís, o pegás, el prompt: las instrucciones de lo que querés que haga.",
-      ],
-      html: `<div class="split-text"><div class="eyebrow">El chat</div><h2 class="h m">Un chat nuevo por subdiario</h2>
-        ${E.lista(["<b>Chat nuevo</b> para cada cliente y libro.", "El <b>clip</b> adjunta archivos.", "El <b>prompt</b> dice qué tiene que hacer."], 0)}</div>
-        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Nuevo chat</span></div>
-          <div class="body"><div style="margin:auto;text-align:center;font-family:Georgia,serif;font-size:34px;color:#3D3929">¿En qué puedo ayudarte hoy?</div></div>
-          <div class="compose"><span class="clip rv" data-s="1" style="border:3px solid var(--orange)">📎</span><span class="rv" data-s="2">Pegá acá el prompt…</span><span class="send">↑</span></div></div>` },
-
-    /* ---------- Ventas ---------- */
-    { ch: 2, narr: [
-        "Empecemos por las ventas.",
-        "Adjuntá dos archivos: el Excel de Comprobantes Emitidos que bajaste de ARCA, y el libro de IVA Ventas que generaste en Onvio.",
-        "Pegá el prompt de ventas, reemplazando el nombre del cliente y el período, y envialo.",
-      ],
-      html: `<div class="split-text"><div class="eyebrow">Ventas</div><h2 class="h m">ARCA contra el libro</h2>
-        ${E.lista(["<b>Excel de Emitidos</b> de ARCA.", "<b>Libro IVA Ventas</b> de Onvio.", "Prompt de ventas, con cliente y período."])}</div>
-        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Cliente A · Ventas 07/2026</span></div>
-          <div class="body"><div class="msg u rv" data-s="1"><div class="files"><span class="file"><b class="x">XLSX</b>Mis Comprobantes Emitidos 07-2026</span><span class="file"><b class="x">XLSX</b>Libro IVA Ventas 07-2026</span></div>
-            <span class="rv" data-s="2">Sos un asistente contable. Te adjunto dos archivos de la empresa <b>Cliente A</b>, período <b>07/2026</b>… Compará los dos archivos comprobante por comprobante y verificá…</span></div></div>
-          <div class="compose"><span class="clip">📎</span><span>Responder…</span><span class="send">↑</span></div></div>` },
-    E.texto({ ch: 2, eyebrow: "Qué pedirle en ventas", titulo: "Los puntos que no pueden faltar", tam: "m",
+      html: `<div class="shot-h"><div class="eyebrow">Sectores</div><h2 class="h">Módulos y tableros</h2></div>
+        <div class="app" style="left:60px;right:60px;top:150px;bottom:60px">
+          ${menu("Sectores")}
+          <div class="main">
+            <div class="ttl">Impuestos <span class="pill o" style="font-size:15px;padding:4px 12px">+ Nuevo módulo</span></div>
+            <div class="cfgrow rv" data-s="1"><b>Módulo IVA</b><span class="mini">3 tableros</span><span style="margin-left:auto">✎ 🗑</span></div>
+            <div style="padding-left:28px;display:flex;flex-direction:column;gap:8px">
+              <div class="cfgrow rv" data-s="2"><span>▦</span>IVA Compras 2026<span class="mini">Clientes / Tareas</span></div>
+              <div class="cfgrow rv" data-s="2"><span>▦</span>IVA Ventas 2026<span class="mini">Clientes / Tareas</span></div>
+              <div class="cfgrow rv" data-s="3" style="border-color:var(--orange)"><span>＋</span><b>Nuevo tablero</b><span class="mini">plantilla: Clientes / Tareas · En blanco</span></div>
+            </div>
+            <div class="callout rv" data-s="3" style="position:static;max-width:none;font-size:19px">«Clientes / Tareas» siembra <em>No empezado · En proceso · Finalizado</em></div>
+          </div>
+        </div>${ILUS}` },
+    E.alerta({ ch: 1, eyebrow: "El límite", titulo: "Solo tu propio sector",
+      texto: "Si intentás crear o editar un módulo de otro sector, el sistema lo rechaza. Y si todavía no tenés sector asignado, pedíselo primero a un Administrador.",
       narr: [
-        "Un buen prompt de ventas le pide a Claude que mire, como mínimo, estos puntos.",
-        "Que estén todos los comprobantes en los dos archivos: que no falte ni sobre ninguno.",
-        "Que coincidan la fecha de emisión, el tipo, el punto de venta y el número.",
-        "Que estén todos los puntos de venta, y que no haya saltos en la numeración.",
-        "Que coincidan los importes: neto, IVA, percepciones y total. Y que las notas de crédito resten.",
-        "Y que avise de cualquier cosa rara: duplicados, importes en cero, moneda extranjera o fechas fuera del período.",
+        "Un límite importante: solo podés crear y editar módulos de tu propio sector.",
+        "Si intentás hacerlo en otro, el sistema te lo rechaza. Y si todavía no tenés un sector asignado, pedíselo a un Administrador: sin eso no podés crear nada.",
+      ] }),
+
+    /* ---------- Configurar tablero ---------- */
+    { ch: 2, narr: [
+        "Dentro del tablero, el botón Configurar maneja dos cosas: los estados y los campos.",
+        "Los estados son las columnas. Agregás una con nombre y color, y tildás Final si corresponde.",
+        "Podés reordenarlas arrastrando, y los cambios de nombre o color se guardan apenas hacés clic afuera.",
+        "Dos reglas: solo puede haber un estado final por tablero, y no podés borrar un estado que todavía tenga tareas.",
+      ],
+      html: `<div class="shot-h"><div class="eyebrow">Configurar</div><h2 class="h">Los estados del tablero</h2></div>
+        <div class="app" style="left:60px;right:60px;top:150px;bottom:60px">
+          ${menu("Sectores")}
+          <div class="main">
+            <div class="ttl">IVA Compras 2026 · Configurar</div>
+            <div class="cfgrow rv" data-s="1"><span>⠿</span><span class="dot2" style="background:#94A3B8"></span>No empezado</div>
+            <div class="cfgrow rv" data-s="1"><span>⠿</span><span class="dot2" style="background:#F59E0B"></span>En proceso</div>
+            <div class="cfgrow rv" data-s="1"><span>⠿</span><span class="dot2" style="background:#10B981"></span>Finalizado<span class="fin">Final</span></div>
+            <div class="cfgrow rv" data-s="3" style="border-color:var(--bad);color:var(--bad)">✕ «Ya existe un estado final en este tablero»</div>
+            <div class="callout rv" data-s="3" style="position:static;max-width:none;font-size:19px">Tampoco se borra un estado que <em>todavía tiene tareas</em>.</div>
+          </div>
+        </div>${ILUS}` },
+    E.texto({ ch: 2, eyebrow: "Campos personalizados", titulo: "Columnas de datos extra", tam: "m",
+      narr: [
+        "La otra parte de Configurar son los campos personalizados: datos extra para las tareas del tablero.",
+        "Hay de tipo texto, número, fecha, moneda, porcentaje, casilla, lista, usuario, cliente y observaciones.",
+        "Dos límites de hoy que conviene conocer: el tipo Lista todavía no permite definir las opciones, así que funciona como texto libre.",
+        "Y el detalle de la tarea todavía no muestra estos campos: se definen en la configuración, pero no hay dónde completarlos tarea por tarea.",
       ],
       items: [
-        "Todos los comprobantes: <b>ni faltantes ni sobrantes</b>.",
-        "<b>Fecha de emisión</b>, tipo, <b>punto de venta</b> y número.",
-        "Todos los <b>puntos de venta</b>, sin saltos de numeración.",
-        "Neto, IVA, percepciones y total · <b>NC restando</b>.",
-        "Cualquier cosa rara: duplicados, ceros, moneda, fechas.",
+        "Texto, número, fecha, moneda, porcentaje, casilla, lista, usuario, cliente, observaciones.",
+        "<b>Lista</b>: hoy funciona como texto libre, sin opciones configurables.",
+        "El detalle de la tarea <b>todavía no</b> permite cargarlos.",
       ] }),
-    { ch: 2, narr: [
-        "Claude responde con un resumen y una tabla con las diferencias.",
-        "En este ejemplo, encontró una fecha distinta y un comprobante que está en ARCA pero falta en el libro.",
-        "Tu trabajo ahora es verificar cada diferencia en Onvio y en ARCA, y corregir lo que corresponda.",
-      ],
-      html: `<div class="split-text"><div class="eyebrow">La respuesta</div><h2 class="h m">Solo las diferencias</h2>
-        ${E.lista(["Resumen con cantidades y totales.", "Tabla de <b>diferencias</b> y <b>faltantes</b>.", "Vos <b>verificás</b> y corregís en Onvio."])}</div>
-        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Cliente A · Ventas 07/2026</span></div>
-          <div class="body"><div class="msg a">
-            <b>Resumen:</b> ARCA tiene <b>47</b> comprobantes ($ 58.412.300,00); el libro tiene <b>46</b> ($ 58.290.000,00). Diferencia: $ 122.300,00.
-            <table class="tbl rv" data-s="1"><tr><th>Comprobante</th><th>Dato</th><th>ARCA</th><th>Libro</th></tr>
-              <tr><td>FC A 0010-00003086</td><td>Fecha</td><td>26/07/2026</td><td class="bad">27/07/2026</td></tr>
-              <tr><td>FC A 0010-00003071</td><td>Presencia</td><td>$ 122.300,00</td><td class="bad">Falta</td></tr></table>
-            <div class="rv" data-s="1" style="margin-top:8px">Los puntos de venta 0010 y 0015 están completos, sin saltos. No hay duplicados.</div>
-          </div></div>
-          <div class="compose"><span class="clip">📎</span><span>Responder…</span><span class="send">↑</span></div></div>` },
 
-    /* ---------- Compras ---------- */
+    /* ---------- Equipo ---------- */
     { ch: 3, narr: [
-        "Ahora, las compras. Acá la comparación es distinta: el libro se controla contra los comprobantes reales.",
-        "Juntá todos los PDFs de las facturas de compra del período en un archivo ZIP: seleccionalos, clic derecho, y «Comprimir en archivo ZIP».",
-        "Adjuntá el libro de IVA Compras de Onvio y el ZIP con los PDFs, pegá el prompt de compras y envialo.",
+        "Tareas de mi Equipo es tu vista de supervisión: todas las tareas de tu sector, de cualquier tablero, en un solo listado.",
+        "Lo filtrás por estado —pendientes, finalizadas, vencidas o todas— y por persona.",
+        "Desde acá hacés dos cosas que un Integrante no puede: eliminar tareas,",
+        "y cargar tiempo a mano con los botones de más quince, treinta, sesenta o ciento veinte minutos.",
       ],
-      html: `<div class="split-text"><div class="eyebrow">Compras</div><h2 class="h m">El libro contra los PDFs</h2>
-        ${E.lista(["PDFs del período en un <b>ZIP</b>.", "<b>Libro IVA Compras</b> de Onvio.", "Prompt de compras."])}</div>
-        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Cliente A · Compras 07/2026</span></div>
-          <div class="body"><div class="msg u rv" data-s="2"><div class="files"><span class="file"><b class="x">XLSX</b>Libro IVA Compras 07-2026</span><span class="file"><b class="z">ZIP</b>Comprobantes compras 07-2026 (38 PDF)</span></div>
-            Sos un asistente contable. Te adjunto, de la empresa <b>Cliente A</b>, período <b>07/2026</b>… Abrí cada PDF y comparalo con su línea del libro…</div>
-          <div class="rv" data-s="1" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:auto">${Array.from({ length: 8 }, (_, i) => `<span class="file"><b class="p">PDF</b>FC_${3300 + i}.pdf</span>`).join("")}<span class="file">→ <b class="z">ZIP</b></span></div></div>
-          <div class="compose"><span class="clip">📎</span><span>Responder…</span><span class="send">↑</span></div></div>` },
-    E.texto({ ch: 3, eyebrow: "Qué pedirle en compras", titulo: "Además de lo de ventas…", tam: "m",
+      html: `<div class="shot-h"><div class="eyebrow">Supervisión</div><h2 class="h">Tareas de mi Equipo</h2></div>
+        <div class="app" style="left:60px;right:60px;top:150px;bottom:60px">
+          ${menu("Tareas de mi Equipo")}
+          <div class="main">
+            <div class="ttl">Tareas de mi Equipo</div>
+            <div style="display:flex;gap:8px" class="rv" data-s="1"><span class="pill o" style="font-size:16px">Pendientes</span><span class="pill n" style="font-size:16px;background:var(--paper);color:var(--navy)">Finalizadas</span><span class="pill n" style="font-size:16px;background:var(--paper);color:var(--navy)">Vencidas</span><span class="pill n" style="font-size:16px;background:var(--paper);color:var(--navy)">Persona ▾</span></div>
+            <table class="tbl2"><tr><th>Tarea</th><th>Tablero</th><th>Persona</th><th>Estado</th><th>Acciones</th></tr>
+              <tr><td>Empresa Demo S.A.</td><td>IVA Compras</td><td>M. Pérez</td><td><span class="sem a"><i></i>Por vencer</span></td><td class="rv" data-s="2">🗑 <span class="rv" data-s="3" style="color:var(--orange);font-weight:700">+15m +30m +60m</span></td></tr>
+              <tr><td>Comercio Ejemplo SRL</td><td>IVA Ventas</td><td>J. Ríos</td><td><span class="sem r"><i></i>Vencida</span></td><td class="rv" data-s="2">🗑 <span class="rv" data-s="3" style="color:var(--orange);font-weight:700">+15m +30m +60m</span></td></tr>
+            </table>
+          </div>
+        </div>${ILUS}` },
+    { ch: 3, narr: [
+        "Métricas te muestra tu sector: los indicadores, la distribución del semáforo, el avance por estado y la carga de trabajo de cada integrante.",
+        "Con el selector Por persona te enfocás en alguien puntual del equipo.",
+        "Y tenés un chat con inteligencia artificial para preguntar sobre esos datos.",
+        "Ese chat está siempre acotado a tu sector, y nunca ve CUIT ni emails de clientes: se filtran antes de llegar al modelo.",
+      ],
+      html: `<div class="split-text"><div class="eyebrow">Métricas</div><h2 class="h m">Tu sector, en números</h2>
+        ${E.lista(["KPIs, semáforo y avance por estado.", "Carga de trabajo <b>por integrante</b>.", "Chat de IA <b>acotado a tu sector</b>.", "Sin CUIT ni emails: se filtran antes."])}</div>
+        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>Métricas · Impuestos</span></div>
+          <div class="body"><div class="msg u rv" data-s="2">¿Quién tiene más tareas atrasadas esta semana?</div>
+            <div class="msg a rv" data-s="2">En tu sector hay 6 tareas vencidas. Se concentran en IVA: una persona tiene 3, el resto del equipo está al día.</div></div>
+          <div class="compose"><span class="clip">📎</span><span>Preguntá sobre tu sector…</span><span class="send">↑</span></div></div>${ILUS}` },
+
+    /* ---------- Accesos ---------- */
+    { ch: 4, narr: [
+        "Cuando alguien pide acceso a algo tuyo, te toca resolverlo a vos o a un Administrador.",
+        "Abrí el tablero o el sector y entrá a Administrar accesos.",
+        "En Solicitudes pendientes aparece cada pedido, con el visto para aprobar y la cruz para rechazar.",
+        "También podés invitar a alguien directamente, y revocar el acceso de quien ya no lo necesita.",
+        "Un detalle: el buscador de invitar necesita el padrón de usuarios, que es exclusivo del Administrador, así que puede aparecerte vacío. Aprobar una solicitud ya hecha, en cambio, funciona siempre.",
+      ],
+      html: `<div class="shot-h"><div class="eyebrow">Accesos</div><h2 class="h">Solicitudes de tu sector</h2></div>
+        <div class="app" style="left:60px;right:60px;top:150px;bottom:60px">
+          ${menu("Sectores")}
+          <div class="main">
+            <div class="ttl">IVA Compras 2026 · Administrar accesos</div>
+            <div class="mini rv" data-s="1">Solicitudes pendientes</div>
+            <div class="cfgrow rv" data-s="2" style="border-color:var(--orange)"><span class="av">LC</span>L. Castro pidió acceso<span class="mini">hace 2 h</span><span style="margin-left:auto;font-weight:700;color:var(--ok)">✓ Aprobar</span><span style="color:var(--bad);font-weight:700">✕ Rechazar</span></div>
+            <div class="mini rv" data-s="3">Integrantes con acceso</div>
+            <div class="cfgrow rv" data-s="3"><span class="av">MP</span>M. Pérez<span style="margin-left:auto">🗑</span></div>
+            <div class="cfgrow rv" data-s="3"><span class="av">JR</span>J. Ríos<span style="margin-left:auto">🗑</span></div>
+          </div>
+        </div>${ILUS}` },
+
+    /* ---------- Reinicio mensual ---------- */
+    { ch: 5, narr: [
+        "El reinicio mensual es el cierre de mes de un tablero, y es exclusivo de Líder y Administrador.",
+        "Al ejecutarlo, el sistema guarda una foto congelada de cómo quedó cada tarea: su estado, responsable, comentarios y tiempo cargado. Eso es el snapshot, el archivo histórico.",
+        "Después, todas las tareas vuelven a la primera columna, sin fechas, sin comentarios, sin adjuntos y sin tiempo.",
+        "Se conservan tres cosas: el responsable, el cliente y los campos personalizados.",
+        "Se hace desde el tablero, con el botón Reiniciar mes. Y también podés reiniciar un módulo entero de una vez.",
+      ],
+      html: `<div class="pad"><div class="eyebrow">Cierre de mes</div><h2 class="h l">Reinicio mensual</h2></div>
+        <div class="cmp" style="top:290px">
+          <div class="col rv" data-s="1" style="border-top-color:var(--navy)"><h4>Se guarda</h4><p>Un <b>snapshot</b>: estado, responsable, comentarios y tiempo de cada tarea, para consulta histórica.</p></div>
+          <div class="col rv" data-s="2" style="border-top-color:var(--orange)"><h4>Se limpia</h4><p>Las tareas vuelven a la primera columna, sin fechas, comentarios, adjuntos ni tiempo.</p></div>
+        </div>
+        <div class="callout rv" data-s="3" style="left:80px;right:80px;bottom:60px;max-width:none">Se conservan: <em>responsable</em>, <em>cliente</em> y <em>campos personalizados</em> · se puede reiniciar un módulo entero</div>` },
+
+    /* ---------- Vencimientos ---------- */
+    { ch: 6, narr: [
+        "Los vencimientos impositivos son uno de los módulos más grandes, y como Líder tenés edición completa.",
+        "Para dar de alta los impuestos de un cliente, entrá a su ficha, sección Impuestos y vencimientos, y tocá Editar impuestos.",
+        "Tildás los impuestos que le corresponden y elegís un responsable interno para cada uno.",
+        "También cargás los emails de contacto del cliente, que son los que reciben el resumen mensual, y su idioma.",
+      ],
+      html: `<div class="shot-h"><div class="eyebrow">Clientes</div><h2 class="h">Impuestos y responsables</h2></div>
+        <div class="app" style="left:60px;right:60px;top:150px;bottom:60px">
+          ${menu("Clientes")}
+          <div class="main">
+            <div class="ttl">Empresa Demo S.A. · Impuestos y vencimientos</div>
+            <table class="tbl2"><tr><th>Impuesto</th><th>Asignado</th><th>Responsable interno</th></tr>
+              <tr class="rv" data-s="2"><td>IVA</td><td>✓</td><td>M. Pérez</td></tr>
+              <tr class="rv" data-s="2"><td>IIBB CABA</td><td>✓</td><td>J. Ríos</td></tr>
+              <tr class="rv" data-s="2"><td>Ganancias</td><td>—</td><td>—</td></tr>
+            </table>
+            <div class="cfgrow rv" data-s="3"><span>✉</span>contacto@empresademo.com<span class="mini">recibe el resumen mensual</span><span class="pill n" style="margin-left:auto;font-size:15px">ES</span></div>
+          </div>
+        </div>${ILUS}` },
+    { ch: 6, narr: [
+        "¿Y de dónde salen las fechas? De la agenda oficial de ARCA, que se importa cada mes: a mano con un Excel, o sola con el scraper automático.",
+        "El sistema cruza cada impuesto del cliente con la fila de la agenda que le corresponde, según el último dígito de su CUIT. Ese cruce se llama matching y genera el vencimiento solo.",
+        "Hay una regla de oro: un vencimiento cargado a mano nunca se pisa. El matching automático jamás lo sobrescribe.",
+        "Desde la tabla marcás Presentado o Pendiente, y reasignás responsables: de a uno, o todos los impuestos de un cliente juntos.",
+      ],
+      html: `<div class="pad"><div class="eyebrow">De ARCA al vencimiento</div><h2 class="h m">Cómo se generan las fechas</h2></div>
+        <div class="flow" style="top:270px">
+          <div class="fs rv" data-s="0"><i>1 · AGENDA</i><b>Agenda ARCA</b><span>Se importa por Excel o con el scraper automático.</span></div>
+          <div class="fs rv" data-s="1"><i>2 · MATCHING</i><b>Cruce por CUIT</b><span>Según el <b>último dígito</b> del CUIT del cliente.</span></div>
+          <div class="fs hl rv" data-s="1"><i>3 · RESULTADO</i><b>Vencimiento</b><span>Se genera solo, con su fecha.</span></div>
+        </div>
+        <div class="callout rv" data-s="2" style="left:80px;right:80px;bottom:60px;max-width:none;background:var(--bad)">Un vencimiento cargado <em>a mano</em> nunca se sobrescribe: lo manual gana siempre.</div>` },
+    { ch: 6, narr: [
+        "Por último, el envío del resumen mensual a los clientes.",
+        "Tocás Enviar vencimientos y elegís los clientes. Solo se pueden tildar los que tienen al menos un email cargado.",
+        "El asunto y el idioma se ajustan solos según la configuración de cada cliente, y podés agregar gente del estudio en copia y una nota.",
+        "Dos cosas para tener presentes: el envío es cien por ciento manual, no hay nada programado. Y si el servidor no tiene configurada la clave del proveedor de mails, el envío queda en modo simulado: no sale ningún correo real.",
+      ],
+      html: `<div class="shot-h"><div class="eyebrow">Envío</div><h2 class="h">El resumen mensual</h2></div>
+        <div class="app" style="left:60px;right:60px;top:150px;bottom:60px">
+          ${menu("Vencimientos")}
+          <div class="main">
+            <div class="ttl">Enviar vencimientos</div>
+            <div class="cfgrow rv" data-s="1"><span>☑</span>Empresa Demo S.A.<span class="mini">contacto@empresademo.com</span><span class="pill n" style="margin-left:auto;font-size:15px">ES</span></div>
+            <div class="cfgrow rv" data-s="1" style="opacity:.5"><span>☐</span>Servicios Test SAS<span class="mini">sin email cargado — no se puede tildar</span></div>
+            <div class="cfgrow rv" data-s="2"><span>＋</span>Usuarios internos en copia · nota personalizada</div>
+            <div style="display:flex;gap:10px;align-items:center" class="rv" data-s="3"><span class="pill o" style="font-size:18px">Enviar a 1 cliente</span><span class="mini">100 % manual · sin envío programado</span></div>
+          </div>
+        </div>${ILUS}` },
+
+    /* ---------- Recordatorios e importaciones ---------- */
+    { ch: 7, narr: [
+        "Los recordatorios de documentación son dos avisos fijos que el estudio manda cada mes.",
+        "El de último día hábil, con las pautas para agilizar la liquidación, y el del día cinco, que recuerda que el seis vence el plazo.",
+        "Están en Clientes, Recordatorios mensuales. Podés editar el texto: es texto plano, una línea en blanco separa párrafos y una línea que empieza con guion arma una lista.",
+        "Tildás los destinatarios y enviás. Con Guardar grupo queda memorizado para el mes siguiente.",
+      ],
+      html: `<div class="split-text"><div class="eyebrow">Recordatorios</div><h2 class="h m">Dos avisos por mes</h2>
+        ${E.lista(["<b>Último día hábil</b>: pautas para agilizar.", "<b>Día 5</b>: el 6 vence el plazo.", "Texto plano · «Restaurar original» vuelve al de fábrica.", "<b>Guardar grupo</b> memoriza los destinatarios."])}</div>
+        <div class="app" style="left:560px;right:60px;top:110px;bottom:70px;font-size:16px">
+          <div class="main" style="padding:16px">
+            <div style="display:flex;gap:8px"><span class="pill o" style="font-size:15px">Último día hábil</span><span class="pill n" style="font-size:15px;background:var(--paper);color:var(--navy)">Día 5</span></div>
+            <div class="cfgrow"><span class="mini">Asunto</span>Pautas para agilizar la liquidación mensual</div>
+            <div class="cfgrow" style="align-items:flex-start;height:120px"><span class="mini">Cuerpo</span><span>Estimado cliente, para agilizar la liquidación del mes le pedimos…</span></div>
+            <div style="display:flex;gap:8px"><span class="pill n" style="font-size:15px">Guardar texto</span><span class="pill o" style="font-size:15px">Enviar a 12 clientes</span></div>
+          </div>
+        </div>${ILUS}` },
+    { ch: 7, narr: [
+        "Y las importaciones por Excel. Cada una está en su lugar natural de la aplicación.",
+        "El catálogo de impuestos y la agenda de ARCA, en Vencimientos. Las asignaciones de cliente e impuesto, también.",
+        "Las tareas por tablero y las fechas de vencimiento, en Importaciones.",
+        "Todas funcionan igual: subís el Excel y el sistema te muestra cuántas filas importó y cuántas rechazó, con el motivo exacto de cada rechazo. Un error en una fila no frena el resto del archivo.",
+      ],
+      html: `<div class="pad"><div class="eyebrow">Importaciones</div><h2 class="h m">Qué se importa y dónde</h2></div>
+        <div class="sum" style="top:220px;gap:10px">
+          <div class="row rv" data-s="1"><b style="font-size:22px">Catálogo de impuestos</b><span>Vencimientos › Impuestos · <em>&nbsp;Nombre, Nombre ARCA</em></span></div>
+          <div class="row rv" data-s="1"><b style="font-size:22px">Agenda ARCA</b><span>Vencimientos › Agenda · <em>&nbsp;Impuesto, Terminación, Fecha</em></span></div>
+          <div class="row rv" data-s="1"><b style="font-size:22px">Asignaciones</b><span>Vencimientos › Asignaciones · <em>&nbsp;CUIT, Impuesto</em></span></div>
+          <div class="row rv" data-s="2"><b style="font-size:22px">Tareas y fechas</b><span>Importaciones · <em>&nbsp;Cliente, Responsable, Fecha</em></span></div>
+        </div>
+        <div class="callout rv" data-s="3" style="left:80px;right:80px;bottom:56px;max-width:none">Siempre devuelve <em>importadas vs. rechazadas</em>, con el motivo de cada rechazo</div>` },
+    E.texto({ ch: 7, eyebrow: "Tus límites", titulo: "Lo que sigue siendo del Administrador", tam: "m",
       narr: [
-        "En compras, además de los puntos de ventas, pedile que controle esto.",
-        "Que cada PDF tenga su línea en el libro, y que cada línea tenga su PDF.",
-        "Que cada percepción esté en el régimen y la jurisdicción correctos, por ejemplo Ingresos Brutos CABA o Provincia.",
-        "Que el CUIT del proveedor no sea el de nuestra propia empresa cliente.",
-        "Y que avise si hay facturas en dólares, comprobantes ilegibles o comprobantes de meses anteriores.",
+        "Para cerrar, lo que no podés hacer como Líder.",
+        "Crear o eliminar sectores, y tocar módulos de otro sector.",
+        "Dar de alta o eliminar clientes, e importar el padrón maestro.",
+        "Ver el padrón de usuarios completo, la auditoría del sistema y el Módulo IA.",
+        "Y la bandeja de tickets de soporte técnico, que es del rol Developer.",
       ],
       items: [
-        "Cada <b>PDF</b> con su línea, y cada línea con su PDF.",
-        "Percepciones en el <b>régimen y jurisdicción</b> correctos.",
-        "El proveedor <b>nunca</b> es nuestro propio cliente.",
-        "Dólares, ilegibles y comprobantes de otros meses.",
-      ] }),
-    { ch: 3, narr: [
-        "La respuesta tiene el mismo formato: un resumen y la tabla de diferencias.",
-        "En este caso, encontró una percepción de Ingresos Brutos cargada en la jurisdicción equivocada, y un PDF que no está en el libro.",
-        "Si una diferencia no te cierra, repreguntale sobre ese comprobante en particular: tenés el prompt para repreguntar en el panel lateral.",
-      ],
-      html: `<div class="split-text"><div class="eyebrow">La respuesta</div><h2 class="h m">Diferencias por PDF</h2>
-        ${E.lista(["Percepción en la jurisdicción equivocada.", "PDF sin línea en el libro.", "Si no te cierra: <b>repreguntá</b>."])}</div>
-        <div class="chat"><div class="bar2"><i></i><i></i><i></i><span>claude.ai · Cliente A · Compras 07/2026</span></div>
-          <div class="body"><div class="msg a">
-            <b>Resumen:</b> 38 PDFs y 37 líneas en el libro.
-            <table class="tbl rv" data-s="1"><tr><th>PDF</th><th>Dato</th><th>PDF</th><th>Libro</th></tr>
-              <tr><td>FC_3302.pdf</td><td>Perc. IIBB</td><td>CABA $ 4.500</td><td class="bad">PBA $ 4.500</td></tr>
-              <tr><td>FC_3307.pdf</td><td>Presencia</td><td>$ 96.800</td><td class="bad">Falta</td></tr></table></div>
-          <div class="msg u rv" data-s="2">Revisá de nuevo solo el comprobante FC A 00012-00003302. Mostrame, lado a lado, los valores…</div></div>
-          <div class="compose"><span class="clip">📎</span><span>Responder…</span><span class="send">↑</span></div></div>` },
-
-    /* ---------- Buenas prácticas ---------- */
-    E.tarjetas({ ch: 4, eyebrow: "Buenas prácticas", titulo: "Para usar Claude bien",
-      narr: [
-        "Cuatro buenas prácticas para cerrar.",
-        "Verificá siempre: Claude puede equivocarse, sobre todo con PDFs escaneados o poco legibles.",
-        "Un chat por subdiario: así no se mezclan clientes ni períodos.",
-        "Sé específico: nombrá el cliente, el período y qué datos comparar. Cuanto más claro el prompt, mejor la respuesta.",
-        "Y cuidá la información: usá solo la cuenta del equipo, nunca una personal.",
-      ],
-      cards: [
-        { ic: "check", t: "Verificá siempre", p: "Cada diferencia se confirma en Onvio o ARCA." },
-        { ic: "doc", t: "Un chat por subdiario", p: "Sin mezclar clientes ni períodos." },
-        { ic: "lista", t: "Sé específico", p: "Cliente, período y datos a comparar." },
-        { ic: "llave", t: "Cuenta del equipo", p: "Nunca una cuenta personal." },
+        "Crear o eliminar <b>sectores</b> · módulos de otro sector.",
+        "Alta y baja de <b>clientes</b> · padrón maestro.",
+        "<b>Usuarios</b>, <b>Auditoría</b> y <b>Módulo IA</b>.",
+        "La bandeja de <b>tickets</b> (rol Developer).",
       ] }),
 
-    E.resumen({ ch: 5, titulo: "Tu control antes de enviar",
+    E.resumen({ ch: 8, titulo: "Tu mes como Líder",
       filas: [
-        ["Ingreso", "claude.ai · <em>Continuar con Google</em> · cuenta del equipo"],
-        ["Ventas", "Excel de Emitidos (ARCA) + Libro IVA Ventas"],
-        ["Compras", "Libro IVA Compras + <em>&nbsp;ZIP con los PDFs</em>"],
-        ["Prompt", "Fechas, puntos de venta, faltantes, importes, rarezas"],
-        ["Después", "<em>Verificá</em> cada diferencia y corregí"],
+        ["Estructura", "Módulos y tableros · <em>&nbsp;solo tu sector</em>"],
+        ["Tablero", "Un solo estado <em>&nbsp;Final&nbsp;</em> · no se borra un estado con tareas"],
+        ["Equipo", "Tareas de mi Equipo · eliminar y cargar tiempo · Métricas"],
+        ["Accesos", "Aprobar o rechazar solicitudes · revocar"],
+        ["Cierre", "Reinicio mensual: snapshot + tareas limpias"],
+        ["Clientes", "Impuestos, matching por CUIT, envíos <em>&nbsp;manuales</em>"],
       ],
       narr: [
         "Repasemos.",
-        "Ingresás a claude.ai con la cuenta de Google del equipo.",
-        "Para ventas, adjuntás el Excel de Emitidos de ARCA y el libro de IVA Ventas.",
-        "Para compras, el libro de IVA Compras y un ZIP con los PDFs.",
-        "El prompt pide revisar fechas, puntos de venta, faltantes, importes y cualquier cosa rara.",
-        "Y cada diferencia la verificás vos antes de corregir y enviar. Ahora, al test.",
+        "Armás la estructura de tu sector: módulos y tableros, solo del tuyo.",
+        "En cada tablero hay un solo estado final, y no se borra un estado que tenga tareas.",
+        "Supervisás con Tareas de mi Equipo y Métricas, y ahí podés eliminar tareas y cargar tiempo.",
+        "Aprobás o rechazás las solicitudes de acceso.",
+        "Cerrás el mes con el reinicio, que deja un snapshot histórico.",
+        "Y gestionás los impuestos de cada cliente, el matching por CUIT y los envíos, que son manuales. Ahora, al test.",
       ] }),
   ],
 
   quiz: [
-    { ch: 2, short: "Archivos para ventas",
-      q: "Vas a controlar el subdiario de IVA Ventas. ¿Qué archivos le adjuntás a Claude?",
-      why: "Para ventas se compara el Excel de Comprobantes Emitidos de ARCA con el libro de IVA Ventas de Onvio.",
+    { ch: 5, short: "Qué guarda el reinicio mensual",
+      scene: "Vas a reiniciar el tablero de IVA Compras al cerrar el mes.",
+      q: "¿Qué pasa con la información?",
+      why: "El reinicio guarda un snapshot histórico y deja las tareas en la primera columna, sin fechas, comentarios, adjuntos ni tiempo. Se conservan responsable, cliente y campos personalizados.",
       opts: [
-        { t: "El Excel de Emitidos de ARCA y el libro de IVA Ventas de Onvio.", ok: true },
-        { t: "El Excel de Recibidos de ARCA y el libro de IVA Ventas.", why: "Recibidos son las compras." },
-        { t: "Solo el libro de IVA Ventas.", why: "Sin la información de origen no hay contra qué comparar." },
-        { t: "Un ZIP con los PDFs de compras.", why: "Eso corresponde al control de compras." },
+        { t: "Queda un snapshot histórico; las tareas vuelven al inicio conservando responsable, cliente y campos personalizados.", ok: true },
+        { t: "Se borra todo, incluido el historial.", why: "Justamente, el snapshot conserva cómo quedó el mes." },
+        { t: "Se duplica el tablero y el original queda archivado.", why: "No se duplica: se reinicia el mismo tablero." },
+        { t: "Solo se borran las tareas finalizadas.", why: "Vuelven todas a la primera columna." },
       ] },
-    { ch: 3, short: "Archivos para compras",
-      q: "¿Y para el subdiario de IVA Compras?",
-      why: "Para compras se envía el libro de IVA Compras junto con los comprobantes en PDF comprimidos en un ZIP.",
+    { ch: 6, short: "Vencimiento manual vs. ARCA",
+      scene: "Cargaste a mano la fecha de un vencimiento y al día siguiente se importa la agenda de ARCA.",
+      q: "¿Qué pasa con tu fecha?",
+      why: "Lo manual gana siempre: el matching automático nunca sobrescribe un vencimiento cargado a mano.",
       opts: [
-        { t: "El libro de IVA Compras y un ZIP con los PDFs de los comprobantes.", ok: true },
-        { t: "El Excel de Recibidos de ARCA y el libro de IVA Compras.", why: "El control de compras se hace contra los comprobantes reales." },
-        { t: "Los PDFs, sin el libro.", why: "Sin el libro no hay nada que controlar." },
-        { t: "El libro de IVA Ventas.", why: "Ese es el de ventas." },
+        { t: "Se mantiene: el matching nunca pisa un vencimiento manual.", ok: true },
+        { t: "La reemplaza la fecha de ARCA.", why: "El sistema respeta la carga manual." },
+        { t: "Quedan las dos y hay que elegir una.", why: "No se duplica el vencimiento." },
+        { t: "Se borra y hay que volver a cargarla.", why: "No se pierde." },
       ] },
-    { ch: 1, short: "Qué cuenta usar",
-      q: "Tenés una cuenta personal de Claude en tu casa. ¿Podés usarla para revisar un subdiario?",
-      why: "Hay que usar la cuenta de Google del estudio con acceso al equipo: la información de los clientes no debe salir de ahí.",
+    { ch: 2, short: "Segundo estado final",
+      q: "Querés marcar «Entregado» como estado final, pero el tablero ya tiene «Finalizado» como final. ¿Qué pasa?",
+      why: "Solo puede haber un estado final por tablero: el sistema avisa «Ya existe un estado final en este tablero».",
       opts: [
-        { t: "No: solo la cuenta del estudio con acceso al equipo.", ok: true },
-        { t: "Sí, si borro el chat después.", why: "La información ya habría salido de la cuenta del equipo." },
-        { t: "Sí, si es desde la computadora del estudio.", why: "Lo que importa es la cuenta, no la computadora." },
-        { t: "Sí, solo para compras.", why: "Aplica a todos los subdiarios." },
+        { t: "El sistema no me deja: solo puede haber un estado final.", ok: true },
+        { t: "Se permite: puede haber varios finales.", why: "El sistema lo impide." },
+        { t: "El anterior deja de ser final automáticamente.", why: "No se cambia solo: hay que desmarcarlo." },
+        { t: "Se permite, pero el semáforo deja de andar.", why: "El sistema directamente no lo acepta." },
       ] },
-    { ch: 4, short: "Claude marca una diferencia",
-      scene: "Claude dice que la FC A 0010-00003086 tiene fecha 27/07 en el libro y 26/07 en ARCA.",
-      q: "¿Qué hacés?",
-      why: "Claude es una ayuda: cada diferencia se verifica en el sistema antes de corregir.",
+    { ch: 2, short: "Borrar un estado con tareas",
+      q: "Querés eliminar la columna «En revisión», que todavía tiene 4 tareas. ¿Qué hacés?",
+      why: "No se puede borrar un estado que tenga tareas: primero hay que moverlas a otra columna.",
       opts: [
-        { t: "Lo verifico en ARCA y en Onvio, y corrijo si corresponde.", ok: true },
-        { t: "Corrijo en Onvio sin mirar.", why: "Claude puede equivocarse: hay que verificar." },
-        { t: "Lo ignoro: seguro es un error de Claude.", why: "Puede ser una diferencia real." },
-        { t: "Envío el subdiario y aviso al revisor que Claude encontró algo.", why: "Primero verificás y corregís vos." },
+        { t: "Muevo primero las 4 tareas a otra columna y después borro el estado.", ok: true },
+        { t: "La borro: las tareas pasan solas a la primera columna.", why: "El sistema no permite borrarla con tareas adentro." },
+        { t: "La borro: las tareas se eliminan con ella.", why: "El sistema lo impide, justamente para no perderlas." },
+        { t: "Reinicio el mes y después la borro.", why: "Tras el reinicio las tareas siguen existiendo, en la primera columna." },
       ] },
-    { ch: 2, short: "Mejor prompt",
-      q: "¿Cuál de estos prompts es mejor para controlar ventas?",
-      why: "Un buen prompt nombra cliente y período, y dice qué comparar y cómo devolver el resultado.",
+    { ch: 1, short: "Módulo de otro sector",
+      q: "Un compañero de otro sector te pide que le crees un módulo. ¿Podés?",
+      why: "Un Líder solo crea y edita módulos de su propio sector; el sistema rechaza los de otros.",
       opts: [
-        { t: "«Compará el Excel de ARCA con el libro de Cliente A, 07/2026: fechas, PV, números, importes y faltantes; devolvé solo las diferencias en una tabla».", ok: true },
-        { t: "«Fijate si está bien».", why: "No dice qué comparar ni cómo responder." },
-        { t: "«Resumime estos archivos».", why: "Un resumen no es un control." },
-        { t: "«Corregí el libro».", why: "Claude no corrige en Onvio: el control y la corrección los hacés vos." },
+        { t: "No: solo módulos de mi sector. Lo tiene que hacer su Líder o un Administrador.", ok: true },
+        { t: "Sí, si tengo acceso a ese sector.", why: "El acceso permite ver y trabajar, no crear su estructura." },
+        { t: "Sí: los módulos no tienen restricción.", why: "La tienen: el servidor valida el sector." },
+        { t: "Sí, pero queda pendiente de aprobación.", why: "No existe ese circuito: se rechaza." },
       ] },
-    { ch: 4, short: "Chats y clientes",
-      q: "Terminaste de controlar Cliente A y seguís con Cliente B. ¿Qué hacés?",
-      why: "Conviene un chat nuevo por subdiario para no mezclar clientes ni períodos.",
+    { ch: 6, short: "Cliente sin email",
+      scene: "Vas a enviar el resumen mensual y un cliente aparece pero no se puede tildar.",
+      q: "¿Por qué?",
+      why: "Solo se pueden seleccionar los clientes que tienen al menos un email de contacto cargado.",
       opts: [
-        { t: "Abro un chat nuevo para Cliente B.", ok: true },
-        { t: "Sigo en el mismo chat y adjunto los archivos nuevos.", why: "Se pueden mezclar datos de los dos clientes." },
-        { t: "Adjunto los dos clientes juntos para ganar tiempo.", why: "Aumenta el riesgo de confusión." },
-        { t: "Borro el chat anterior y reutilizo el prompt sin cambiarlo.", why: "El prompt tiene que nombrar el cliente y el período correctos." },
+        { t: "No tiene ningún email de contacto cargado.", ok: true },
+        { t: "No tiene impuestos asignados.", why: "El bloqueo es por el email." },
+        { t: "Ya se le envió este mes.", why: "El sistema no bloquea por envíos anteriores." },
+        { t: "Está en idioma inglés.", why: "El idioma solo cambia el texto del correo." },
       ] },
-    { ch: 3, short: "Proveedor igual al cliente",
-      q: "¿Por qué el prompt de compras pide verificar que el CUIT del proveedor no sea el de nuestra empresa cliente?",
-      why: "En compras, la empresa cliente es la receptora: su CUIT nunca debe aparecer como proveedor. Si pasa, hay un error de carga.",
+    { ch: 6, short: "Envío en modo simulado",
+      q: "Enviaste el resumen y el sistema dice «SIMULADO». ¿Qué significa?",
+      why: "Si el servidor no tiene configurada la clave del proveedor de emails, el envío se procesa pero no sale ningún correo real.",
       opts: [
-        { t: "Porque la empresa cliente es la receptora: si figura como proveedor, hay un error.", ok: true },
-        { t: "Porque ARCA lo exige en el prompt.", why: "Es un control interno de calidad." },
-        { t: "Porque así Claude lee más rápido.", why: "No tiene que ver con la velocidad." },
-        { t: "No hace falta verificarlo.", why: "Es un error frecuente y conviene detectarlo." },
+        { t: "No salió ningún mail real: falta configurar la clave del proveedor de emails en el servidor.", ok: true },
+        { t: "Los mails salieron, pero sin archivos adjuntos.", why: "En modo simulado no se envía nada." },
+        { t: "Quedaron programados para el día siguiente.", why: "No hay envíos programados." },
+        { t: "Los recibió solo el personal interno en copia.", why: "Tampoco: no sale ningún correo." },
+      ] },
+    { ch: 3, short: "Alcance de las métricas",
+      q: "Como Líder, ¿qué datos ves en Métricas y en su chat de IA?",
+      why: "Métricas y su chat están siempre acotados a tu sector y tu equipo, y no exponen CUIT ni emails de clientes.",
+      opts: [
+        { t: "Los de mi sector y mi equipo, sin CUIT ni emails de clientes.", ok: true },
+        { t: "Los de todo el estudio.", why: "La vista global es del Administrador." },
+        { t: "Solo mis propias tareas.", why: "Esa es la vista del Integrante." },
+        { t: "Todo, incluidos los datos de contacto de los clientes.", why: "Esos datos se filtran antes de llegar al modelo." },
+      ] },
+    { ch: 4, short: "Buscador de invitar vacío",
+      q: "Al querer invitar a alguien a un tablero, el buscador de usuarios te aparece vacío. ¿Qué hacés?",
+      why: "Ese buscador necesita el padrón completo de usuarios, que es exclusivo del Administrador. Aprobar una solicitud ya hecha sí funciona siempre.",
+      opts: [
+        { t: "Le pido a esa persona que solicite el acceso, y yo apruebo la solicitud.", ok: true },
+        { t: "Le doy mi usuario y contraseña para que entre.", why: "Nunca se comparten credenciales." },
+        { t: "Creo un usuario nuevo para esa persona.", why: "Crear usuarios es del Administrador." },
+        { t: "Abro un ticket para que le den acceso a todo el sistema.", why: "Alcanza con aprobar su solicitud." },
       ] },
   ],
 };
